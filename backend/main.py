@@ -1,12 +1,10 @@
 from fastapi import FastAPI
 from dotenv import load_dotenv
-from app.routers import usuarios, pilotos
+from app.routers import usuarios, pilotos, carreras
 import os
 
-# Carga las variables del archivo .env
 load_dotenv()
 
-# Crea la aplicación FastAPI
 app = FastAPI(
     title=os.getenv("APP_NAME"),
     version=os.getenv("VERSION"),
@@ -15,9 +13,9 @@ app = FastAPI(
 
 # Registra los routers
 app.include_router(usuarios.router)
-app.include_router(pilotos.router)  # ← AÑADIDO
+app.include_router(pilotos.router)
+app.include_router(carreras.router)
 
-# Endpoint raíz
 @app.get("/")
 def root():
     return {
@@ -26,7 +24,6 @@ def root():
         "estado": "funcionando"
     }
 
-# Endpoint de salud
 @app.get("/health", operation_id="health_check")
 def health():
     return {"estado": "ok"}
