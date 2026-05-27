@@ -6,3 +6,5 @@
 *.tfvars
 .env
 backend/venv/
+__pycache__/
+*.pyc
