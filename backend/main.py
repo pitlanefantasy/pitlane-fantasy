@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from dotenv import load_dotenv
+from app.routers import usuarios
 import os
 
 # Carga las variables del archivo .env
@@ -12,7 +13,10 @@ app = FastAPI(
     description="API del juego fantasy de MotoGP, Moto2 y Moto3"
 )
 
-# Primer endpoint — comprueba que la API funciona
+# Registra los routers
+app.include_router(usuarios.router)
+
+# Endpoint raíz
 @app.get("/")
 def root():
     return {
@@ -21,7 +25,7 @@ def root():
         "estado": "funcionando"
     }
 
-# Endpoint de salud — para Kubernetes
+# Endpoint de salud
 @app.get("/health")
 def health():
     return {"estado": "ok"}
