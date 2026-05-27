@@ -16,3 +16,8 @@ variable "zone" {
     default     = "europe-west1-b"
 }
 
+variable "db_password" {
+    description = "pass"
+    type        = string
+    sensitive   = true
+}
