@@ -47,7 +47,7 @@ CREATE TABLE resultados (
 CREATE TABLE ligas (
   id          SERIAL PRIMARY KEY,
   nombre      VARCHAR(100) NOT NULL,
-  codigo      VARCHAR(10) UNIQUE NOT NULL,
+  codigo      VARCHAR(15) UNIQUE NOT NULL,
   creador_id  INTEGER REFERENCES usuarios(id),
   temporada   INTEGER NOT NULL,
   publica     BOOLEAN DEFAULT FALSE,
