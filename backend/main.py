@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from dotenv import load_dotenv
-from app.routers import usuarios, pilotos, carreras, equipos, pronosticos
+from app.routers import usuarios, pilotos, carreras, equipos, pronosticos, resultados
 import os
 
 load_dotenv()
@@ -11,12 +11,12 @@ app = FastAPI(
     description="API del juego fantasy de MotoGP, Moto2 y Moto3"
 )
 
-# Registra los routers
 app.include_router(usuarios.router)
 app.include_router(pilotos.router)
 app.include_router(carreras.router)
 app.include_router(equipos.router)
 app.include_router(pronosticos.router)
+app.include_router(resultados.router)
 
 @app.get("/")
 def root():
