@@ -38,6 +38,7 @@ def obtener_usuario(usuario_id: int, db: Session = Depends(get_db)):
 def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
     usuario = db.query(Usuario).filter(Usuario.email == form_data.username).first()
     if not usuario:
+        
         raise HTTPException(status_code=401, detail="Email o contraseña incorrectos")
     if not verificar_password(form_data.password, usuario.password_hash):
         raise HTTPException(status_code=401, detail="Email o contraseña incorrectos")
