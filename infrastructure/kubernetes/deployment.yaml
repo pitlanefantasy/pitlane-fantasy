@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pitlane-api
+  labels:
+    app: pitlane-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pitlane-api
+  template:
+    metadata:
+      labels:
+        app: pitlane-api
+    spec:
+      containers:
+      - name: pitlane-api
+        image: europe-west1-docker.pkg.dev/pitlane-fantasy/pitlane-repo/pitlane-fantasy-api:latest
+        ports:
+        - containerPort: 8000
+        env:
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: pitlane-secrets
+              key: DATABASE_URL
+        - name: APP_NAME
+          valueFrom:
+            secretKeyRef:
+              name: pitlane-secrets
+              key: APP_NAME
+        - name: VERSION
+          valueFrom:
+            secretKeyRef:
+              name: pitlane-secrets
+              key: VERSION
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 10
+          periodSeconds: 5
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 15
+          periodSeconds: 10

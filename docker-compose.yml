@@ -1,0 +1,28 @@
+services:
+  api:
+    build: ./backend
+    container_name: pitlane-api
+    restart: always
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./backend/.env
+    networks:
+      - pitlane-network
+
+  nginx:
+    image: nginx:alpine
+    container_name: pitlane-nginx
+    restart: always
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - api
+    networks:
+      - pitlane-network
+
+networks:
+  pitlane-network:
+    driver: bridge
