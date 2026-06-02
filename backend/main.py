@@ -1,6 +1,7 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
-from app.routers import usuarios, pilotos, carreras, equipos, pronosticos, resultados,ligas
+from app.routers import usuarios, pilotos, carreras, equipos, pronosticos, resultados, ligas
 import os
 
 load_dotenv()
@@ -9,6 +10,15 @@ app = FastAPI(
     title=os.getenv("APP_NAME"),
     version=os.getenv("VERSION"),
     description="API del juego fantasy de MotoGP, Moto2 y Moto3"
+)
+
+# Permite peticiones desde el frontend React
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://192.168.0.153:3000", "http://localhost:3000"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 app.include_router(usuarios.router)
