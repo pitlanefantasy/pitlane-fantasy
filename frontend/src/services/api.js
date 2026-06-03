@@ -16,4 +16,16 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+// Extrae los datos del usuario del token JWT
+export function getUsuario() {
+  const token = localStorage.getItem('token');
+  if (!token) return null;
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    return payload; // { email: '...', id: 1 }
+  } catch {
+    return null;
+  }
+}
+
 export default api;
