@@ -27,11 +27,13 @@ class EquipoCreate(BaseModel):
     moto3_plata1_id: int
     moto3_plata2_id: int
 
-    # Capitán y mecánicas
-    capitan_id: int
-    comodin_usado: bool = False
+    # Capitanes por categoría
+    capitan_motogp_id: Optional[int] = None
+    capitan_moto2_id: Optional[int] = None
+    capitan_moto3_id: Optional[int] = None
 
-    # Predicción pole
+    # Comodín y predicciones
+    comodin_usado: bool = False
     pole_motogp_id: Optional[int] = None
     pole_moto2_id: Optional[int] = None
     pole_moto3_id: Optional[int] = None
