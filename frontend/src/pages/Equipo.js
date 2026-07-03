@@ -25,12 +25,22 @@ function Equipo() {
   const MAX_BOOSTS = 3;
 
   useEffect(() => {
+    const usuario = getUsuario();
     api.get('/carreras/proxima')
       .then(res => setProximaCarrera(res.data));
     ['MotoGP', 'Moto2', 'Moto3'].forEach(cat => {
       api.get(`/pilotos/categoria/${cat}`)
         .then(res => setPilotos(prev => ({ ...prev, [cat]: res.data })));
     });
+    if (usuario) {
+      api.get(`/equipos/boosts/${usuario.id}/2026`)
+        .then(res => setBoostsUsados({
+          MotoGP: res.data.MOTOGP?.usados || 0,
+          Moto2: res.data.MOTO2?.usados || 0,
+          Moto3: res.data.MOTO3?.usados || 0,
+        }))
+        .catch(() => {});
+    }
   }, []);
 
   useEffect(() => {

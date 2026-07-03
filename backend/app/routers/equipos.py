@@ -30,32 +30,32 @@ def validar_equipo(equipo: EquipoCreate):
               equipo.moto3_plata1_id, equipo.moto3_plata2_id]
     if equipo.capitan_motogp_id and equipo.capitan_motogp_id not in motogp:
         raise HTTPException(status_code=400,
-            detail="El capitán MotoGP debe ser uno de tus 4 pilotos MotoGP")
+            detail="El boost MotoGP debe ser uno de tus 4 pilotos MotoGP")
     if equipo.capitan_moto2_id and equipo.capitan_moto2_id not in moto2:
         raise HTTPException(status_code=400,
-            detail="El capitán Moto2 debe ser uno de tus 4 pilotos Moto2")
+            detail="El boost Moto2 debe ser uno de tus 4 pilotos Moto2")
     if equipo.capitan_moto3_id and equipo.capitan_moto3_id not in moto3:
         raise HTTPException(status_code=400,
-            detail="El capitán Moto3 debe ser uno de tus 4 pilotos Moto3")
+            detail="El boost Moto3 debe ser uno de tus 4 pilotos Moto3")
 
-def validar_usos_capitan(equipo: EquipoCreate, db: Session):
-    capitanes = {
+def validar_usos_boost(equipo: EquipoCreate, db: Session):
+    boosts = {
         'motogp': equipo.capitan_motogp_id,
         'moto2':  equipo.capitan_moto2_id,
         'moto3':  equipo.capitan_moto3_id,
     }
-    for cat, capitan_id in capitanes.items():
-        if not capitan_id:
+    for cat, boost_id in boosts.items():
+        if not boost_id:
             continue
         campo = f'capitan_{cat}_id'
         usos = db.query(Equipo).join(Carrera).filter(
             Equipo.usuario_id == equipo.usuario_id,
-            getattr(Equipo, campo) == capitan_id,
+            getattr(Equipo, campo) != None,
             Carrera.temporada == equipo.temporada
         ).count()
         if usos >= 3:
             raise HTTPException(status_code=400,
-                detail=f"Ya has usado este capitán 3 veces en {cat.upper()} esta temporada")
+                detail=f"Ya has usado el boost 3 veces en {cat.upper()} esta temporada")
 
 def validar_presupuesto(equipo: EquipoCreate, db: Session):
     PRESUPUESTO = 60.0
@@ -85,13 +85,30 @@ def crear_equipo(equipo: EquipoCreate, db: Session = Depends(get_db)):
     if existente:
         raise HTTPException(status_code=400, detail="Ya tienes equipo para esta carrera")
     validar_equipo(equipo)
-    validar_usos_capitan(equipo, db)
+    validar_usos_boost(equipo, db)
     validar_presupuesto(equipo, db)
     nuevo = Equipo(**equipo.model_dump())
     db.add(nuevo)
     db.commit()
     db.refresh(nuevo)
     return nuevo
+
+@router.get("/boosts/{usuario_id}/{temporada}")
+def usos_boost(usuario_id: int, temporada: int, db: Session = Depends(get_db)):
+    result = {}
+    for cat in ['motogp', 'moto2', 'moto3']:
+        campo = f'capitan_{cat}_id'
+        usos = db.query(Equipo).join(Carrera).filter(
+            Equipo.usuario_id == usuario_id,
+            getattr(Equipo, campo) != None,
+            Carrera.temporada == temporada
+        ).count()
+        result[cat.upper()] = {'usados': usos, 'restantes': 3 - usos}
+    return result
+
+@router.get("/usuario/{usuario_id}", response_model=List[EquipoResponse])
+def equipos_usuario(usuario_id: int, db: Session = Depends(get_db)):
+    return db.query(Equipo).filter(Equipo.usuario_id == usuario_id).all()
 
 @router.get("/{usuario_id}/{carrera_id}", response_model=EquipoResponse)
 def obtener_equipo(usuario_id: int, carrera_id: int, db: Session = Depends(get_db)):
@@ -102,7 +119,3 @@ def obtener_equipo(usuario_id: int, carrera_id: int, db: Session = Depends(get_d
     if not equipo:
         raise HTTPException(status_code=404, detail="Equipo no encontrado")
     return equipo
-
-@router.get("/usuario/{usuario_id}", response_model=List[EquipoResponse])
-def equipos_usuario(usuario_id: int, db: Session = Depends(get_db)):
-    return db.query(Equipo).filter(Equipo.usuario_id == usuario_id).all()
