@@ -16,6 +16,8 @@ function Equipo() {
     capitan_moto3_id: '',
   });
   const [mensaje, setMensaje] = useState('');
+  const [presupuestoUsado, setPresupuestoUsado] = useState(0);
+  const PRESUPUESTO = 60;
 
   useEffect(() => {
     api.get('/carreras/proxima')
@@ -25,6 +27,24 @@ function Equipo() {
         .then(res => setPilotos(prev => ({ ...prev, [cat]: res.data })));
     });
   }, []);
+
+  useEffect(() => {
+    const ids = [
+      equipo.motogp_oro1_id, equipo.motogp_oro2_id,
+      equipo.motogp_plata1_id, equipo.motogp_plata2_id,
+      equipo.moto2_oro1_id, equipo.moto2_oro2_id,
+      equipo.moto2_plata1_id, equipo.moto2_plata2_id,
+      equipo.moto3_oro1_id, equipo.moto3_oro2_id,
+      equipo.moto3_plata1_id, equipo.moto3_plata2_id,
+    ].filter(id => id !== '');
+
+    const todosLosPilotos = [...pilotos.MotoGP, ...pilotos.Moto2, ...pilotos.Moto3];
+    const total = ids.reduce((sum, id) => {
+      const p = todosLosPilotos.find(p => String(p.id) === String(id));
+      return sum + (p ? parseFloat(p.precio) : 0);
+    }, 0);
+    setPresupuestoUsado(total);
+  }, [equipo, pilotos]);
 
   const handleGuardar = async () => {
     const usuario = getUsuario();
@@ -112,6 +132,17 @@ function Equipo() {
   return (
     <div style={{ padding: '30px', maxWidth: '800px', margin: '0 auto' }}>
       <h1>🏍️ Mi Equipo</h1>
+
+      <div style={{
+        padding: '10px 20px',
+        backgroundColor: presupuestoUsado > PRESUPUESTO ? '#fddede' : '#d4edda',
+        borderRadius: '8px',
+        marginBottom: '20px'
+      }}>
+        💰 Presupuesto: {(PRESUPUESTO - presupuestoUsado).toFixed(1)}M restantes
+        ({presupuestoUsado.toFixed(1)}M / {PRESUPUESTO}M usados)
+      </div>
+
       {proximaCarrera && (
         <h3>GP: {proximaCarrera.nombre} — {proximaCarrera.fecha}</h3>
       )}
