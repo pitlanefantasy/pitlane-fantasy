@@ -64,7 +64,9 @@ function Equipo() {
         onChange={e => setEquipo(prev => ({ ...prev, [campo]: e.target.value }))}>
         <option value=''>-- Elige piloto --</option>
         {pilotos[categoria].map(p =>
-          <option key={p.id} value={p.id}>{p.nombre} ({p.equipo})</option>)}
+          <option key={p.id} value={p.id}>
+            {p.nombre} ({p.equipo}) — 💰{p.precio}M
+          </option>)}
       </select>
     </div>
   );
@@ -77,8 +79,10 @@ function Equipo() {
       equipo[`${categoria}_plata2_id`],
     ].filter(id => id !== '');
 
-    const pilotosFiltrados = pilotos[categoria === 'motogp' ? 'MotoGP' : categoria === 'moto2' ? 'Moto2' : 'Moto3']
-      .filter(p => pilotosCategoria.includes(String(p.id)));
+    const cat = categoria === 'motogp' ? 'MotoGP' : categoria === 'moto2' ? 'Moto2' : 'Moto3';
+    const pilotosFiltrados = pilotos[cat].filter(p =>
+      pilotosCategoria.includes(String(p.id))
+    );
 
     return (
       <div style={{ margin: '8px 0' }}>
