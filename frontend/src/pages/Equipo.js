@@ -20,7 +20,9 @@ function Equipo() {
   });
   const [mensaje, setMensaje] = useState('');
   const [presupuestoUsado, setPresupuestoUsado] = useState(0);
+  const [boostsUsados, setBoostsUsados] = useState({ MotoGP: 0, Moto2: 0, Moto3: 0 });
   const PRESUPUESTO = 60;
+  const MAX_BOOSTS = 3;
 
   useEffect(() => {
     api.get('/carreras/proxima')
@@ -40,7 +42,6 @@ function Equipo() {
       equipo.moto3_oro1_id, equipo.moto3_oro2_id,
       equipo.moto3_plata1_id, equipo.moto3_plata2_id,
     ].filter(id => id !== '');
-
     const todosLosPilotos = [...pilotos.MotoGP, ...pilotos.Moto2, ...pilotos.Moto3];
     const total = ids.reduce((sum, id) => {
       const p = todosLosPilotos.find(p => String(p.id) === String(id));
@@ -109,7 +110,7 @@ function Equipo() {
     </div>
   );
 
-  const renderCapitan = (label, campo, categoria) => {
+  const renderBoost = (label, campo, categoria) => {
     const pilotosCategoria = [
       equipo[`${categoria}_oro1_id`],
       equipo[`${categoria}_oro2_id`],
@@ -120,12 +121,13 @@ function Equipo() {
     const pilotosFiltrados = pilotos[cat].filter(p =>
       pilotosCategoria.includes(String(p.id))
     );
+    const usosRestantes = MAX_BOOSTS - (boostsUsados[cat] || 0);
     return (
-      <div style={{ margin: '8px 0' }}>
-        <label>{label}: </label>
+      <div style={{ margin: '8px 0', padding: '8px', backgroundColor: '#fff3cd', borderRadius: '4px' }}>
+        <label>{label} ({usosRestantes} usos restantes): </label>
         <select value={equipo[campo]}
           onChange={e => setEquipo(prev => ({ ...prev, [campo]: e.target.value }))}>
-          <option value=''>-- Sin capitán --</option>
+          <option value=''>-- Sin boost --</option>
           {pilotosFiltrados.map(p =>
             <option key={p.id} value={p.id}>{p.nombre}</option>)}
         </select>
@@ -152,8 +154,7 @@ function Equipo() {
       <div style={{
         padding: '10px 20px',
         backgroundColor: presupuestoUsado > PRESUPUESTO ? '#fddede' : '#d4edda',
-        borderRadius: '8px',
-        marginBottom: '20px'
+        borderRadius: '8px', marginBottom: '20px'
       }}>
         💰 Presupuesto: {(PRESUPUESTO - presupuestoUsado).toFixed(1)}M restantes
         ({presupuestoUsado.toFixed(1)}M / {PRESUPUESTO}M usados)
@@ -168,7 +169,7 @@ function Equipo() {
       {renderSelector('🥇 Oro 2', 'motogp_oro2_id', 'MotoGP')}
       {renderSelector('🥈 Plata 1', 'motogp_plata1_id', 'MotoGP')}
       {renderSelector('🥈 Plata 2', 'motogp_plata2_id', 'MotoGP')}
-      {renderCapitan('🎖️ Capitán MotoGP', 'capitan_motogp_id', 'motogp')}
+      {renderBoost('⚡ Boost MotoGP', 'capitan_motogp_id', 'motogp')}
       {renderPole('🏁 Pole MotoGP', 'pole_motogp_id', 'MotoGP')}
 
       <h2>Moto2</h2>
@@ -176,7 +177,7 @@ function Equipo() {
       {renderSelector('🥇 Oro 2', 'moto2_oro2_id', 'Moto2')}
       {renderSelector('🥈 Plata 1', 'moto2_plata1_id', 'Moto2')}
       {renderSelector('🥈 Plata 2', 'moto2_plata2_id', 'Moto2')}
-      {renderCapitan('🎖️ Capitán Moto2', 'capitan_moto2_id', 'moto2')}
+      {renderBoost('⚡ Boost Moto2', 'capitan_moto2_id', 'moto2')}
       {renderPole('🏁 Pole Moto2', 'pole_moto2_id', 'Moto2')}
 
       <h2>Moto3</h2>
@@ -184,7 +185,7 @@ function Equipo() {
       {renderSelector('🥇 Oro 2', 'moto3_oro2_id', 'Moto3')}
       {renderSelector('🥈 Plata 1', 'moto3_plata1_id', 'Moto3')}
       {renderSelector('🥈 Plata 2', 'moto3_plata2_id', 'Moto3')}
-      {renderCapitan('🎖️ Capitán Moto3', 'capitan_moto3_id', 'moto3')}
+      {renderBoost('⚡ Boost Moto3', 'capitan_moto3_id', 'moto3')}
       {renderPole('🏁 Pole Moto3', 'pole_moto3_id', 'Moto3')}
 
       <br />
