@@ -5,6 +5,7 @@ import Login from './pages/Login';
 import Registro from './pages/Registro';
 import Equipo from './pages/Equipo';
 import Ranking from './pages/Ranking';
+import RutaProtegida from './components/RutaProtegida';
 
 function App() {
   return (
@@ -13,8 +14,12 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/registro" element={<Registro />} />
-        <Route path="/equipo" element={<Equipo />} />
-        <Route path="/ranking" element={<Ranking />} />
+        <Route path="/equipo" element={
+          <RutaProtegida><Equipo /></RutaProtegida>
+        } />
+        <Route path="/ranking" element={
+          <RutaProtegida><Ranking /></RutaProtegida>
+        } />
       </Routes>
     </Router>
   );
