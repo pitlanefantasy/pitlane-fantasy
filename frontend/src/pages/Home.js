@@ -29,6 +29,8 @@ function Home() {
           {' | '}
           <a href="/ranking">Ranking</a>
           {' | '}
+          <a href="/ligas">Ligas</a>
+          {' | '}
           <button onClick={handleLogout}>Cerrar sesión</button>
         </div>
       ) : (
