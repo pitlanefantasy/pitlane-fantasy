@@ -14,6 +14,9 @@ function Equipo() {
     capitan_motogp_id: '',
     capitan_moto2_id: '',
     capitan_moto3_id: '',
+    pole_motogp_id: '',
+    pole_moto2_id: '',
+    pole_moto3_id: '',
   });
   const [mensaje, setMensaje] = useState('');
   const [presupuestoUsado, setPresupuestoUsado] = useState(0);
@@ -81,6 +84,9 @@ function Equipo() {
         capitan_motogp_id: equipo.capitan_motogp_id ? parseInt(equipo.capitan_motogp_id) : null,
         capitan_moto2_id: equipo.capitan_moto2_id ? parseInt(equipo.capitan_moto2_id) : null,
         capitan_moto3_id: equipo.capitan_moto3_id ? parseInt(equipo.capitan_moto3_id) : null,
+        pole_motogp_id: equipo.pole_motogp_id ? parseInt(equipo.pole_motogp_id) : null,
+        pole_moto2_id: equipo.pole_moto2_id ? parseInt(equipo.pole_moto2_id) : null,
+        pole_moto3_id: equipo.pole_moto3_id ? parseInt(equipo.pole_moto3_id) : null,
       });
       setMensaje('✅ Equipo guardado correctamente');
     } catch (err) {
@@ -110,12 +116,10 @@ function Equipo() {
       equipo[`${categoria}_plata1_id`],
       equipo[`${categoria}_plata2_id`],
     ].filter(id => id !== '');
-
     const cat = categoria === 'motogp' ? 'MotoGP' : categoria === 'moto2' ? 'Moto2' : 'Moto3';
     const pilotosFiltrados = pilotos[cat].filter(p =>
       pilotosCategoria.includes(String(p.id))
     );
-
     return (
       <div style={{ margin: '8px 0' }}>
         <label>{label}: </label>
@@ -128,6 +132,18 @@ function Equipo() {
       </div>
     );
   };
+
+  const renderPole = (label, campo, categoria) => (
+    <div style={{ margin: '8px 0' }}>
+      <label>{label}: </label>
+      <select value={equipo[campo]}
+        onChange={e => setEquipo(prev => ({ ...prev, [campo]: e.target.value }))}>
+        <option value=''>-- Sin predicción --</option>
+        {pilotos[categoria].map(p =>
+          <option key={p.id} value={p.id}>{p.nombre}</option>)}
+      </select>
+    </div>
+  );
 
   return (
     <div style={{ padding: '30px', maxWidth: '800px', margin: '0 auto' }}>
@@ -153,6 +169,7 @@ function Equipo() {
       {renderSelector('🥈 Plata 1', 'motogp_plata1_id', 'MotoGP')}
       {renderSelector('🥈 Plata 2', 'motogp_plata2_id', 'MotoGP')}
       {renderCapitan('🎖️ Capitán MotoGP', 'capitan_motogp_id', 'motogp')}
+      {renderPole('🏁 Pole MotoGP', 'pole_motogp_id', 'MotoGP')}
 
       <h2>Moto2</h2>
       {renderSelector('🥇 Oro 1', 'moto2_oro1_id', 'Moto2')}
@@ -160,6 +177,7 @@ function Equipo() {
       {renderSelector('🥈 Plata 1', 'moto2_plata1_id', 'Moto2')}
       {renderSelector('🥈 Plata 2', 'moto2_plata2_id', 'Moto2')}
       {renderCapitan('🎖️ Capitán Moto2', 'capitan_moto2_id', 'moto2')}
+      {renderPole('🏁 Pole Moto2', 'pole_moto2_id', 'Moto2')}
 
       <h2>Moto3</h2>
       {renderSelector('🥇 Oro 1', 'moto3_oro1_id', 'Moto3')}
@@ -167,6 +185,7 @@ function Equipo() {
       {renderSelector('🥈 Plata 1', 'moto3_plata1_id', 'Moto3')}
       {renderSelector('🥈 Plata 2', 'moto3_plata2_id', 'Moto3')}
       {renderCapitan('🎖️ Capitán Moto3', 'capitan_moto3_id', 'moto3')}
+      {renderPole('🏁 Pole Moto3', 'pole_moto3_id', 'Moto3')}
 
       <br />
       <button onClick={handleGuardar} style={{ padding: '10px 30px', fontSize: '16px' }}>
