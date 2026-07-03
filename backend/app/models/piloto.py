@@ -12,3 +12,4 @@ class Piloto(Base):
     nacionalidad = Column(String(50))
     precio       = Column(Numeric(5, 2), nullable=False)
     activo       = Column(Boolean, default=True)
+    rookie       = Column(Boolean, default=False)

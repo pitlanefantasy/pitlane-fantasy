@@ -6,6 +6,7 @@ import Registro from './pages/Registro';
 import Equipo from './pages/Equipo';
 import Ranking from './pages/Ranking';
 import Ligas from './pages/Ligas';
+import Pronosticos from './pages/Pronosticos';
 import RutaProtegida from './components/RutaProtegida';
 
 function App() {
@@ -15,15 +16,10 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/registro" element={<Registro />} />
-        <Route path="/equipo" element={
-          <RutaProtegida><Equipo /></RutaProtegida>
-        } />
-        <Route path="/ranking" element={
-          <RutaProtegida><Ranking /></RutaProtegida>
-        } />
-        <Route path="/ligas" element={
-          <RutaProtegida><Ligas /></RutaProtegida>
-        } />
+        <Route path="/equipo" element={<RutaProtegida><Equipo /></RutaProtegida>} />
+        <Route path="/ranking" element={<RutaProtegida><Ranking /></RutaProtegida>} />
+        <Route path="/ligas" element={<RutaProtegida><Ligas /></RutaProtegida>} />
+        <Route path="/pronosticos" element={<RutaProtegida><Pronosticos /></RutaProtegida>} />
       </Routes>
     </Router>
   );

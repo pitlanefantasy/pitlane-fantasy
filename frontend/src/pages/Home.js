@@ -31,6 +31,8 @@ function Home() {
           {' | '}
           <a href="/ligas">Ligas</a>
           {' | '}
+          <a href="/pronosticos">Pronósticos</a>
+          {' | '}
           <button onClick={handleLogout}>Cerrar sesión</button>
         </div>
       ) : (
