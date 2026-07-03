@@ -9,7 +9,6 @@ from typing import List
 router = APIRouter(prefix="/equipos", tags=["equipos"])
 
 def validar_equipo(equipo: EquipoCreate):
-    # Recoger todos los pilotos
     pilotos = [
         equipo.motogp_oro1_id, equipo.motogp_oro2_id,
         equipo.motogp_plata1_id, equipo.motogp_plata2_id,
@@ -19,21 +18,15 @@ def validar_equipo(equipo: EquipoCreate):
         equipo.moto3_plata1_id, equipo.moto3_plata2_id,
     ]
     pilotos = [p for p in pilotos if p is not None]
-
-    # Comprobar duplicados
     if len(pilotos) != len(set(pilotos)):
         raise HTTPException(status_code=400,
             detail="No puedes tener el mismo piloto dos veces en el equipo")
-
-    # Pilotos MotoGP
     motogp = [equipo.motogp_oro1_id, equipo.motogp_oro2_id,
               equipo.motogp_plata1_id, equipo.motogp_plata2_id]
-    moto2 = [equipo.moto2_oro1_id, equipo.moto2_oro2_id,
-             equipo.moto2_plata1_id, equipo.moto2_plata2_id]
-    moto3 = [equipo.moto3_oro1_id, equipo.moto3_oro2_id,
-             equipo.moto3_plata1_id, equipo.moto3_plata2_id]
-
-    # Validar capitanes
+    moto2  = [equipo.moto2_oro1_id, equipo.moto2_oro2_id,
+              equipo.moto2_plata1_id, equipo.moto2_plata2_id]
+    moto3  = [equipo.moto3_oro1_id, equipo.moto3_oro2_id,
+              equipo.moto3_plata1_id, equipo.moto3_plata2_id]
     if equipo.capitan_motogp_id and equipo.capitan_motogp_id not in motogp:
         raise HTTPException(status_code=400,
             detail="El capitán MotoGP debe ser uno de tus 4 pilotos MotoGP")
@@ -45,11 +38,10 @@ def validar_equipo(equipo: EquipoCreate):
             detail="El capitán Moto3 debe ser uno de tus 4 pilotos Moto3")
 
 def validar_usos_capitan(equipo: EquipoCreate, db: Session):
-    """Valida que cada capitán no se haya usado más de 3 veces esta temporada"""
     capitanes = {
         'motogp': equipo.capitan_motogp_id,
-        'moto2': equipo.capitan_moto2_id,
-        'moto3': equipo.capitan_moto3_id,
+        'moto2':  equipo.capitan_moto2_id,
+        'moto3':  equipo.capitan_moto3_id,
     }
     for cat, capitan_id in capitanes.items():
         if not capitan_id:
@@ -72,10 +64,8 @@ def crear_equipo(equipo: EquipoCreate, db: Session = Depends(get_db)):
     ).first()
     if existente:
         raise HTTPException(status_code=400, detail="Ya tienes equipo para esta carrera")
-
     validar_equipo(equipo)
     validar_usos_capitan(equipo, db)
-
     nuevo = Equipo(**equipo.model_dump())
     db.add(nuevo)
     db.commit()
@@ -89,3 +79,9 @@ def obtener_equipo(usuario_id: int, carrera_id: int, db: Session = Depends(get_d
         Equipo.carrera_id == carrera_id
     ).first()
     if not equipo:
+        raise HTTPException(status_code=404, detail="Equipo no encontrado")
+    return equipo
+
+@router.get("/usuario/{usuario_id}", response_model=List[EquipoResponse])
+def equipos_usuario(usuario_id: int, db: Session = Depends(get_db)):
+    return db.query(Equipo).filter(Equipo.usuario_id == usuario_id).all()
