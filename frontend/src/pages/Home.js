@@ -6,16 +6,11 @@ function Home() {
   const [usuario, setUsuario] = useState(null);
 
   useEffect(() => {
-    // Carga la próxima carrera al entrar
     api.get('/carreras/proxima')
       .then(res => setProximaCarrera(res.data))
-      .catch(err => console.log('No hay carrera próxima'));
-
-    // Comprueba si hay usuario logueado
+      .catch(() => {});
     const token = localStorage.getItem('token');
-    if (token) {
-      setUsuario('logueado');
-    }
+    if (token) setUsuario('logueado');
   }, []);
 
   const handleLogout = () => {
@@ -29,7 +24,13 @@ function Home() {
       <p>El fantasy de MotoGP, Moto2 y Moto3</p>
 
       {usuario ? (
-        <button onClick={handleLogout}>Cerrar sesión</button>
+        <div>
+          <a href="/equipo">Mi Equipo</a>
+          {' | '}
+          <a href="/ranking">Ranking</a>
+          {' | '}
+          <button onClick={handleLogout}>Cerrar sesión</button>
+        </div>
       ) : (
         <div>
           <a href="/login">Iniciar sesión</a>
