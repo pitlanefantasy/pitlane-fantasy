@@ -7,6 +7,7 @@ import Equipo from './pages/Equipo';
 import Ranking from './pages/Ranking';
 import Ligas from './pages/Ligas';
 import Pronosticos from './pages/Pronosticos';
+import Admin from './pages/Admin';
 import RutaProtegida from './components/RutaProtegida';
 
 function App() {
@@ -20,6 +21,7 @@ function App() {
         <Route path="/ranking" element={<RutaProtegida><Ranking /></RutaProtegida>} />
         <Route path="/ligas" element={<RutaProtegida><Ligas /></RutaProtegida>} />
         <Route path="/pronosticos" element={<RutaProtegida><Pronosticos /></RutaProtegida>} />
+        <Route path="/admin" element={<RutaProtegida><Admin /></RutaProtegida>} />
       </Routes>
     </Router>
   );
