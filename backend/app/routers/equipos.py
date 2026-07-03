@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.models.equipo import Equipo
 from app.models.carrera import Carrera
+from app.models.piloto import Piloto
 from app.schemas.equipo import EquipoCreate, EquipoResponse
 from typing import List
 
@@ -56,6 +57,25 @@ def validar_usos_capitan(equipo: EquipoCreate, db: Session):
             raise HTTPException(status_code=400,
                 detail=f"Ya has usado este capitán 3 veces en {cat.upper()} esta temporada")
 
+def validar_presupuesto(equipo: EquipoCreate, db: Session):
+    PRESUPUESTO = 60.0
+    pilotos_ids = [
+        equipo.motogp_oro1_id, equipo.motogp_oro2_id,
+        equipo.motogp_plata1_id, equipo.motogp_plata2_id,
+        equipo.moto2_oro1_id, equipo.moto2_oro2_id,
+        equipo.moto2_plata1_id, equipo.moto2_plata2_id,
+        equipo.moto3_oro1_id, equipo.moto3_oro2_id,
+        equipo.moto3_plata1_id, equipo.moto3_plata2_id,
+    ]
+    total = 0.0
+    for pid in pilotos_ids:
+        piloto = db.query(Piloto).filter(Piloto.id == pid).first()
+        if piloto:
+            total += float(piloto.precio)
+    if total > PRESUPUESTO:
+        raise HTTPException(status_code=400,
+            detail=f"Presupuesto superado — total: {total}M / máximo: {PRESUPUESTO}M")
+
 @router.post("/", response_model=EquipoResponse)
 def crear_equipo(equipo: EquipoCreate, db: Session = Depends(get_db)):
     existente = db.query(Equipo).filter(
@@ -66,6 +86,7 @@ def crear_equipo(equipo: EquipoCreate, db: Session = Depends(get_db)):
         raise HTTPException(status_code=400, detail="Ya tienes equipo para esta carrera")
     validar_equipo(equipo)
     validar_usos_capitan(equipo, db)
+    validar_presupuesto(equipo, db)
     nuevo = Equipo(**equipo.model_dump())
     db.add(nuevo)
     db.commit()

@@ -29,6 +29,18 @@ function Equipo() {
   const handleGuardar = async () => {
     const usuario = getUsuario();
     if (!usuario) { window.location.href = '/login'; return; }
+
+    const camposObligatorios = [
+      'motogp_oro1_id', 'motogp_oro2_id', 'motogp_plata1_id', 'motogp_plata2_id',
+      'moto2_oro1_id', 'moto2_oro2_id', 'moto2_plata1_id', 'moto2_plata2_id',
+      'moto3_oro1_id', 'moto3_oro2_id', 'moto3_plata1_id', 'moto3_plata2_id',
+    ];
+    const faltantes = camposObligatorios.filter(c => !equipo[c]);
+    if (faltantes.length > 0) {
+      setMensaje('❌ Debes seleccionar los 12 pilotos antes de guardar');
+      return;
+    }
+
     try {
       await api.post('/equipos/', {
         usuario_id: usuario.id,
