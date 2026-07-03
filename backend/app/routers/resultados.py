@@ -59,3 +59,10 @@ def resultado_piloto(carrera_id: int, piloto_id: int, db: Session = Depends(get_
     if not resultado:
         raise HTTPException(status_code=404, detail="Resultado no encontrado")
     return resultado
+from app.services.precios import actualizar_precios
+
+@router.post("/{carrera_id}/calcular-precios")
+def calcular_precios(carrera_id: int, db: Session = Depends(get_db)):
+    actualizar_precios(carrera_id, db)
+    return {"mensaje": f"Precios actualizados tras carrera {carrera_id}"}
+    
