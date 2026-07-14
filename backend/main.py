@@ -12,10 +12,16 @@ app = FastAPI(
     description="API del juego fantasy de MotoGP, Moto2 y Moto3"
 )
 
-# Permite peticiones desde el frontend React
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://192.168.0.153:3000", "http://localhost:3000"],
+    allow_origins=[
+        "http://192.168.0.139:3000",
+        "http://localhost:3000",
+        "https://pitplayfantasy.com",
+        "http://pitplayfantasy.com",
+        "https://www.pitplayfantasy.com",
+        "http://www.pitplayfantasy.com",
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

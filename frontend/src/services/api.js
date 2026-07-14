@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'http://34.62.203.185',
+  baseURL: 'https://api.pitplayfantasy.com',
   headers: {
     'Content-Type': 'application/json',
   },
