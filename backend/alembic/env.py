@@ -12,7 +12,7 @@ sys.path.append(os.getcwd())
 load_dotenv()
 
 from app.core.database import Base
-from app.models import carrera, equipo, liga, piloto, pronostico, resultado, usuario  # noqa: F401
+from app.models import carrera, circuito, equipo, liga, piloto, pronostico, resultado, usuario  # noqa: F401
 
 config = context.config
 config.set_main_option("sqlalchemy.url", os.getenv("DATABASE_URL"))
