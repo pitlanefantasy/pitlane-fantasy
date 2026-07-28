@@ -4,7 +4,7 @@ export default function Navbar() {
   return (
     <nav className="flex items-center justify-between px-6 py-4 bg-pit-asphalt border-b border-pit-grey/20">
       <Link to="/" className="font-display font-bold text-xl text-pit-white tracking-wide">
-        PIT<span className="text-pit-red">LANE</span>
+        PIT<span className="text-pit-red">PLAY</span>
       </Link>
       <div className="flex gap-6 text-sm text-pit-grey font-display uppercase tracking-wide">
         <Link to="/" className="hover:text-pit-white">Inicio</Link>
