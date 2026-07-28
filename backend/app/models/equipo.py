@@ -1,9 +1,10 @@
-from sqlalchemy import Column, Integer, Boolean, Numeric, DateTime, ForeignKey
+from sqlalchemy import Column, Integer, Boolean, Numeric, DateTime, ForeignKey, UniqueConstraint
 from sqlalchemy.sql import func
 from app.core.database import Base
 
 class Equipo(Base):
     __tablename__ = "equipos"
+    __table_args__ = (UniqueConstraint("usuario_id", "carrera_id", name="equipos_usuario_id_carrera_id_key"),)
 
     id                 = Column(Integer, primary_key=True, index=True)
     usuario_id         = Column(Integer, ForeignKey("usuarios.id"), nullable=False)
