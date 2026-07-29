@@ -4,12 +4,16 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        'pit-asphalt': '#1A1D23',
-        'pit-asphalt-light': '#24282F',
-        'pit-red': '#E4002B',
-        'pit-yellow': '#FFC800',
-        'pit-white': '#F5F6F7',
-        'pit-grey': '#8B92A0',
+        'pit-bg': '#F2F3F5',
+        'pit-ink': '#12141A',
+        'pit-muted': '#6B7280',
+        'pit-red': '#E4472B',
+        'pit-up': '#1D9E75',
+        'pit-up-bg': '#E1F5EE',
+        'pit-down': '#A32D2D',
+        'pit-down-bg': '#FAECE7',
+        'pit-best': '#7B5CE0',
+        'pit-best-bg': '#EEEDFE',
       },
       fontFamily: {
         display: ['Oswald', 'sans-serif'],

@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: pitlane-frontend
-        image: gcr.io/pitlane-fantasy/pitlane-frontend:latest
+        image: europe-west1-docker.pkg.dev/pitlane-fantasy/pitlane-repo/pitlane-frontend:v2
         ports:
         - containerPort: 80
 ---

@@ -9,6 +9,7 @@ import Ligas from './pages/Ligas';
 import Pronosticos from './pages/Pronosticos';
 import Admin from './pages/Admin';
 import RutaProtegida from './components/RutaProtegida';
+import Reglas from './pages/Reglas';
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/registro" element={<Registro />} />
+          <Route path="/reglas" element={<Reglas />} />
           <Route path="/equipo" element={<RutaProtegida><Equipo /></RutaProtegida>} />
           <Route path="/ranking" element={<RutaProtegida><Ranking /></RutaProtegida>} />
           <Route path="/ligas" element={<RutaProtegida><Ligas /></RutaProtegida>} />

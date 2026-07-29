@@ -15,24 +15,35 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="bg-pit-asphalt min-h-screen">
-      <section className="text-center pt-16 pb-10 px-4">
-        <h1 className="font-display font-black text-4xl md:text-6xl text-pit-white uppercase tracking-tight">
-          Tu equipo. <span className="text-pit-red">Tu parrilla.</span>
-        </h1>
-        <p className="text-pit-grey mt-3 max-w-md mx-auto">
-          Fantasy de MotoGP, Moto2 y Moto3. Elige tus 12 pilotos cada Gran Premio y compite en tu liga.
-        </p>
-      </section>
+    <div className="bg-pit-bg min-h-screen px-6 md:px-16 pt-10 pb-16">
 
-      <section className="px-4">
-        {loading && <p className="text-center text-pit-grey">Cargando próximo GP...</p>}
+      <p className="font-display text-xl md:text-2xl text-pit-ink max-w-2xl">
+        El fantasy que une <span className="text-pit-red font-bold">MotoGP, Moto2 y Moto3</span> en un solo equipo.
+      </p>
+      <p className="text-pit-muted text-sm max-w-xl mt-2">
+        Pronostica al campeón, al mejor rookie, quién hará más poles y quién se llevará más caídas. Entra y vive el mejor fantasy de motos.
+      </p>
+
+      <section className="pt-8">
+        {loading && <p className="text-pit-muted">Cargando próximo GP...</p>}
         {!loading && proximoGP && <ProximoGP carrera={proximoGP} />}
       </section>
 
-      <section className="text-center py-12">
-        <Link to="/registro" className="bg-pit-red text-white font-display uppercase px-8 py-3 rounded text-lg hover:bg-pit-red/80">
-          Crear mi equipo
+      <section className="mt-16 border-t border-pit-muted/20 pt-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="bg-white rounded-lg p-6 border border-pit-muted/20">
+            <p className="text-pit-red text-xs font-display uppercase tracking-widest">Cada Gran Premio</p>
+            <p className="font-display font-bold text-lg text-pit-ink mt-1">Tu equipo semanal</p>
+            <p className="text-pit-muted text-sm mt-2">2 Oro + 2 Plata por categoría, un capitán y presupuesto que sube y baja según resultados.</p>
+          </div>
+          <div className="bg-white rounded-lg p-6 border border-pit-muted/20">
+            <p className="text-pit-red text-xs font-display uppercase tracking-widest">Toda la temporada</p>
+            <p className="font-display font-bold text-lg text-pit-ink mt-1">Pronósticos de temporada</p>
+            <p className="text-pit-muted text-sm mt-2">Campeón, poles, victorias, rookie y caídas — se suman a tu puntuación total del año.</p>
+          </div>
+        </div>
+        <Link to="/reglas" className="inline-block text-pit-red font-display text-sm uppercase tracking-wide mt-6 hover:underline">
+          Ver todas las reglas del juego →
         </Link>
       </section>
     </div>
