@@ -43,5 +43,5 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depend
     if not verificar_password(form_data.password, usuario.password_hash):
         raise HTTPException(status_code=401, detail="Email o contraseña incorrectos")
 
-    token = crear_token({"sub": usuario.email, "id": usuario.id})
+    token = crear_token({"sub": usuario.email, "id": usuario.id, "nombre": usuario.nombre})
     return {"access_token": token, "token_type": "bearer"}
