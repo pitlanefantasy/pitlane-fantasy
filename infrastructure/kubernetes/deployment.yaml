@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: pitlane-api
-        image: europe-west1-docker.pkg.dev/pitlane-fantasy/pitlane-repo/pitlane-fantasy-api:v8
+        image: europe-west1-docker.pkg.dev/pitlane-fantasy/pitlane-repo/pitlane-fantasy-api:v9
         ports:
         - containerPort: 8000
         env:
@@ -35,6 +35,11 @@ spec:
             secretKeyRef:
               name: pitlane-secrets
               key: VERSION
+        - name: SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: pitlane-secrets
+              key: SECRET_KEY
         readinessProbe:
           httpGet:
             path: /health

@@ -6,17 +6,23 @@ import os
 
 load_dotenv()
 
-SECRET_KEY = "pitlane-fantasy-secret-key-2026"
+SECRET_KEY = os.getenv("SECRET_KEY")
+if not SECRET_KEY:
+    raise RuntimeError("SECRET_KEY no está definida en las variables de entorno")
+
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24
+
 
 def verificar_password(password: str, password_hash: str) -> bool:
     """Verifica si una contraseña coincide con su hash"""
     return hashlib.sha256(password.encode()).hexdigest() == password_hash
 
+
 def hashear_password(password: str) -> str:
     """Convierte una contraseña en hash SHA256"""
     return hashlib.sha256(password.encode()).hexdigest()
+
 
 def crear_token(data: dict) -> str:
     """Genera un JWT token"""
@@ -25,6 +31,7 @@ def crear_token(data: dict) -> str:
     datos.update({"exp": expira})
     return jwt.encode(datos, SECRET_KEY, algorithm=ALGORITHM)
 
+
 def verificar_token(token: str) -> dict:
     """Verifica un JWT token"""
     try:
@@ -32,6 +39,7 @@ def verificar_token(token: str) -> dict:
         return payload
     except JWTError:
         return None
+
 
 from fastapi import Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer
