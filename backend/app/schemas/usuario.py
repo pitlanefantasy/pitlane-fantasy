@@ -12,6 +12,7 @@ class UsuarioResponse(BaseModel):
     id: int
     email: str
     nombre: str
+    es_admin: bool
     created_at: datetime
 
     class Config:

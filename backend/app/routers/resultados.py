@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.core.database import get_db
+from app.core.security import get_admin_actual
 from app.models.resultado import Resultado
 from app.schemas.resultado import ResultadoCreate, ResultadoResponse
 from app.services.puntos import calcular_puntos_carrera, calcular_puntos_sprint
@@ -10,7 +11,11 @@ from typing import List
 router = APIRouter(prefix="/resultados", tags=["resultados"])
 
 @router.post("/", response_model=ResultadoResponse)
-def crear_resultado(resultado: ResultadoCreate, db: Session = Depends(get_db)):
+def crear_resultado(
+    resultado: ResultadoCreate,
+    db: Session = Depends(get_db),
+    admin: dict = Depends(get_admin_actual),
+):
     existente = db.query(Resultado).filter(
         Resultado.carrera_id == resultado.carrera_id,
         Resultado.piloto_id == resultado.piloto_id
@@ -55,12 +60,20 @@ def resultado_piloto(carrera_id: int, piloto_id: int, db: Session = Depends(get_
     return resultado
 
 @router.post("/{carrera_id}/calcular-precios")
-def calcular_precios(carrera_id: int, db: Session = Depends(get_db)):
+def calcular_precios(
+    carrera_id: int,
+    db: Session = Depends(get_db),
+    admin: dict = Depends(get_admin_actual),
+):
     actualizar_precios(carrera_id, db)
     return {"mensaje": f"Precios actualizados tras carrera {carrera_id}"}
 
 @router.post("/{carrera_id}/calcular-equipos")
-def calcular_puntos_equipos(carrera_id: int, db: Session = Depends(get_db)):
+def calcular_puntos_equipos(
+    carrera_id: int,
+    db: Session = Depends(get_db),
+    admin: dict = Depends(get_admin_actual),
+):
     from app.models.equipo import Equipo
 
     resultados = db.query(Resultado).filter(

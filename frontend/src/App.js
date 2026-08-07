@@ -24,7 +24,7 @@ function App() {
           <Route path="/ranking" element={<RutaProtegida><Ranking /></RutaProtegida>} />
           <Route path="/ligas" element={<RutaProtegida><Ligas /></RutaProtegida>} />
           <Route path="/pronosticos" element={<RutaProtegida><Pronosticos /></RutaProtegida>} />
-          <Route path="/admin" element={<RutaProtegida><Admin /></RutaProtegida>} />
+          <Route path="/admin" element={<RutaProtegida soloAdmin><Admin /></RutaProtegida>} />
         </Route>
       </Routes>
     </BrowserRouter>

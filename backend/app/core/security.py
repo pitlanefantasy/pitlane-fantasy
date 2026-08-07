@@ -32,3 +32,23 @@ def verificar_token(token: str) -> dict:
         return payload
     except JWTError:
         return None
+
+from fastapi import Depends, HTTPException
+from fastapi.security import OAuth2PasswordBearer
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="usuarios/login")
+
+
+def get_usuario_actual(token: str = Depends(oauth2_scheme)) -> dict:
+    """Exige un token válido. Devuelve el payload (sub, id, nombre, es_admin)."""
+    payload = verificar_token(token)
+    if payload is None:
+        raise HTTPException(status_code=401, detail="Token inválido o caducado")
+    return payload
+
+
+def get_admin_actual(usuario: dict = Depends(get_usuario_actual)) -> dict:
+    """Exige que el usuario del token sea administrador."""
+    if not usuario.get("es_admin"):
+        raise HTTPException(status_code=403, detail="Requiere permisos de administrador")
+    return usuario

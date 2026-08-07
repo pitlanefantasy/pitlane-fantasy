@@ -4,6 +4,7 @@ from app.core.database import get_db
 from app.models.pronostico import Pronostico
 from app.schemas.pronostico import PronosticoCreate, PronosticoResponse
 from app.services.pronosticos import calcular_puntos_pronostico
+from app.core.security import get_admin_actual
 
 router = APIRouter(prefix="/pronosticos", tags=["pronosticos"])
 
@@ -38,7 +39,7 @@ def obtener_pronostico(usuario_id: int, temporada: int, db: Session = Depends(ge
 
 # POST /pronosticos/calcular/{temporada} → recalcula los puntos de TODOS los pronósticos de esa temporada
 @router.post("/calcular/{temporada}")
-def calcular_pronosticos_temporada(temporada: int, db: Session = Depends(get_db)):
+def calcular_pronosticos_temporada(temporada: int, db: Session = Depends(get_db), admin: dict = Depends(get_admin_actual)):
     pronosticos = db.query(Pronostico).filter(Pronostico.temporada == temporada).all()
     if not pronosticos:
         raise HTTPException(status_code=404, detail="No hay pronósticos para esta temporada")
