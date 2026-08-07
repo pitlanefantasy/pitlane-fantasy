@@ -9,3 +9,4 @@ backend/venv/
 __pycache__/
 *.pyc
 infrastructure/kubernetes/secret.yaml
+.env.local*
