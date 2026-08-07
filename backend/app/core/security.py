@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 from jose import JWTError, jwt
 from dotenv import load_dotenv
-import hashlib
+import bcrypt
 import os
 
 load_dotenv()
@@ -15,13 +15,13 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24
 
 
 def verificar_password(password: str, password_hash: str) -> bool:
-    """Verifica si una contraseña coincide con su hash"""
-    return hashlib.sha256(password.encode()).hexdigest() == password_hash
+    """Verifica si una contraseña coincide con su hash bcrypt"""
+    return bcrypt.checkpw(password.encode(), password_hash.encode())
 
 
 def hashear_password(password: str) -> str:
-    """Convierte una contraseña en hash SHA256"""
-    return hashlib.sha256(password.encode()).hexdigest()
+    """Convierte una contraseña en hash bcrypt (con sal aleatoria incluida)"""
+    return bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
 
 
 def crear_token(data: dict) -> str:
