@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: pitlane-api
-        image: europe-west1-docker.pkg.dev/pitlane-fantasy/pitlane-repo/pitlane-fantasy-api:v3
+        image: europe-west1-docker.pkg.dev/pitlane-fantasy/pitlane-repo/pitlane-fantasy-api:v4
         ports:
         - containerPort: 8000
         env:

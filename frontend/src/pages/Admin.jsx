@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import api from '../services/api';
 
 function Admin() {
@@ -6,7 +6,8 @@ function Admin() {
   const [pilotos, setPilotos] = useState([]);
   const [carreraId, setCarreraId] = useState('');
   const [resultados, setResultados] = useState([]);
-  const [mensaje, setMensaje] = useState('');
+  const [mensaje, setMensaje] = useState(null);
+  const [guardando, setGuardando] = useState(false);
 
   useEffect(() => {
     api.get('/carreras/').then(res => setCarreras(res.data));
@@ -15,6 +16,7 @@ function Admin() {
 
   const handleCarreraChange = (id) => {
     setCarreraId(id);
+    setMensaje(null);
     setResultados(pilotos.map(p => ({
       carrera_id: parseInt(id),
       piloto_id: p.id,
@@ -38,6 +40,10 @@ function Admin() {
     const resultadosValidos = resultados.filter(r =>
       r.posicion_carrera !== '' || r.abandono || r.hizo_pole
     );
+    setMensaje(null);
+    setGuardando(true);
+
+    // 1. Guardar cada resultado
     try {
       for (const r of resultadosValidos) {
         await api.post('/resultados/', {
@@ -50,11 +56,37 @@ function Admin() {
           hizo_pole: r.hizo_pole,
         });
       }
-      setMensaje('✅ Resultados guardados correctamente');
     } catch (err) {
-      const detalle = err.response?.data?.detail || 'Error al guardar';
-      setMensaje(`❌ ${detalle}`);
+      const detalle = err.response?.data?.detail || 'Error al guardar resultados';
+      setMensaje({ tipo: 'error', texto: `❌ ${detalle}` });
+      setGuardando(false);
+      return;
     }
+
+    // 2. Recalcular precios y puntos de equipos
+    try {
+      await api.post(`/resultados/${carreraId}/calcular-precios`);
+      await api.post(`/resultados/${carreraId}/calcular-equipos`);
+    } catch (err) {
+      setMensaje({ tipo: 'error', texto: '⚠️ Resultados guardados, pero falló el recálculo de precios/equipos' });
+      setGuardando(false);
+      return;
+    }
+
+    // 3. Recalcular pronósticos (un 404 aquí es normal si nadie ha guardado pronósticos aún)
+    const carreraSeleccionada = carreras.find(c => String(c.id) === String(carreraId));
+    try {
+      await api.post(`/pronosticos/calcular/${carreraSeleccionada.temporada}`);
+    } catch (err) {
+      if (err.response?.status !== 404) {
+        setMensaje({ tipo: 'error', texto: '⚠️ Resultados y equipos recalculados, pero falló el recálculo de pronósticos' });
+        setGuardando(false);
+        return;
+      }
+    }
+
+    setMensaje({ tipo: 'exito', texto: '✅ Resultados guardados y puntos recalculados correctamente' });
+    setGuardando(false);
   };
 
   const categorias = ['MotoGP', 'Moto2', 'Moto3'];
@@ -123,11 +155,15 @@ function Admin() {
       ))}
 
       {carreraId && (
-        <button onClick={handleGuardar} style={{ padding: '10px 30px', fontSize: '16px' }}>
-          Guardar Resultados
+        <button onClick={handleGuardar} disabled={guardando} style={{ padding: '10px 30px', fontSize: '16px' }}>
+          {guardando ? 'Guardando y recalculando...' : 'Guardar Resultados'}
         </button>
       )}
-      {mensaje && <p>{mensaje}</p>}
+      {mensaje && (
+        <p style={{ color: mensaje.tipo === 'exito' ? 'green' : '#c0392b', fontWeight: 'bold' }}>
+          {mensaje.texto}
+        </p>
+      )}
       <br />
       <a href="/">← Volver al inicio</a>
     </div>

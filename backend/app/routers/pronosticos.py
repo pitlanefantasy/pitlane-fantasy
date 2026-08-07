@@ -3,25 +3,26 @@ from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.models.pronostico import Pronostico
 from app.schemas.pronostico import PronosticoCreate, PronosticoResponse
+from app.services.pronosticos import calcular_puntos_pronostico
 
 router = APIRouter(prefix="/pronosticos", tags=["pronosticos"])
+
 
 # POST /pronosticos/ → crear pronósticos de temporada
 @router.post("/", response_model=PronosticoResponse)
 def crear_pronostico(pronostico: PronosticoCreate, db: Session = Depends(get_db)):
-    # Verificar que no tiene ya pronósticos para esa temporada
     existente = db.query(Pronostico).filter(
         Pronostico.usuario_id == pronostico.usuario_id,
         Pronostico.temporada == pronostico.temporada
     ).first()
     if existente:
         raise HTTPException(status_code=400, detail="Ya tienes pronósticos para esta temporada")
-
     nuevo = Pronostico(**pronostico.model_dump())
     db.add(nuevo)
     db.commit()
     db.refresh(nuevo)
     return nuevo
+
 
 # GET /pronosticos/{usuario_id}/{temporada} → ver pronósticos de un usuario
 @router.get("/{usuario_id}/{temporada}", response_model=PronosticoResponse)
@@ -33,3 +34,19 @@ def obtener_pronostico(usuario_id: int, temporada: int, db: Session = Depends(ge
     if not pronostico:
         raise HTTPException(status_code=404, detail="Pronósticos no encontrados")
     return pronostico
+
+
+# POST /pronosticos/calcular/{temporada} → recalcula los puntos de TODOS los pronósticos de esa temporada
+@router.post("/calcular/{temporada}")
+def calcular_pronosticos_temporada(temporada: int, db: Session = Depends(get_db)):
+    pronosticos = db.query(Pronostico).filter(Pronostico.temporada == temporada).all()
+    if not pronosticos:
+        raise HTTPException(status_code=404, detail="No hay pronósticos para esta temporada")
+
+    resultados = []
+    for p in pronosticos:
+        puntos = calcular_puntos_pronostico(p, db)
+        resultados.append({"usuario_id": p.usuario_id, "puntos_pronosticos": puntos})
+
+    db.commit()
+    return {"mensaje": f"Recalculados {len(pronosticos)} pronósticos", "resultados": resultados}
