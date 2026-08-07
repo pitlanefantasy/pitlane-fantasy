@@ -11,6 +11,7 @@ class Liga(Base):
     creador_id = Column(Integer, ForeignKey("usuarios.id"), nullable=True)
     temporada  = Column(Integer, nullable=False)
     publica    = Column(Boolean, default=False)
+    es_global  = Column(Boolean, default=False, nullable=False)
     created_at = Column(DateTime, server_default=func.now())
 
 class LigaUsuario(Base):

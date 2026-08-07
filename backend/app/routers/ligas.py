@@ -3,14 +3,35 @@ from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.models.liga import Liga, LigaUsuario
 from app.models.equipo import Equipo
+from app.models.pronostico import Pronostico
 from app.models.usuario import Usuario
 from app.schemas.liga import LigaCreate, LigaResponse
 import random, string
 
 router = APIRouter(prefix="/ligas", tags=["ligas"])
 
+
 def generar_codigo():
     return ''.join(random.choices(string.ascii_uppercase + string.digits, k=8))
+
+
+def puntos_totales_usuario(usuario_id: int, temporada: int, db: Session) -> float:
+    """Suma puntos de equipo (todos los GP de la temporada) + pronósticos de esa temporada."""
+    equipos = db.query(Equipo).filter(
+        Equipo.usuario_id == usuario_id,
+        Equipo.temporada == temporada
+    ).all()
+    total = sum(float(e.puntos_total or 0) for e in equipos)
+
+    pronostico = db.query(Pronostico).filter(
+        Pronostico.usuario_id == usuario_id,
+        Pronostico.temporada == temporada
+    ).first()
+    if pronostico:
+        total += float(pronostico.puntos_pronosticos or 0)
+
+    return total
+
 
 @router.post("/", response_model=LigaResponse)
 def crear_liga(liga: LigaCreate, db: Session = Depends(get_db)):
@@ -19,6 +40,7 @@ def crear_liga(liga: LigaCreate, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(nueva)
     return nueva
+
 
 @router.post("/{codigo}/unirse")
 def unirse_liga(codigo: str, usuario_id: int, db: Session = Depends(get_db)):
@@ -36,16 +58,40 @@ def unirse_liga(codigo: str, usuario_id: int, db: Session = Depends(get_db)):
     db.commit()
     return {"mensaje": f"Te has unido a {liga.nombre}", "codigo": codigo}
 
+
 @router.get("/{liga_id}/ranking")
 def ranking_liga(liga_id: int, db: Session = Depends(get_db)):
+    liga = db.query(Liga).filter(Liga.id == liga_id).first()
+    if not liga:
+        raise HTTPException(status_code=404, detail="Liga no encontrada")
+
     miembros = db.query(LigaUsuario).filter(LigaUsuario.liga_id == liga_id).all()
     ranking = []
     for m in miembros:
-        equipos = db.query(Equipo).filter(Equipo.usuario_id == m.usuario_id).all()
-        total = sum(float(e.puntos_total or 0) for e in equipos)
         usuario = db.query(Usuario).filter(Usuario.id == m.usuario_id).first()
+        total = puntos_totales_usuario(m.usuario_id, liga.temporada, db)
         ranking.append({"usuario": usuario.nombre, "puntos": total})
+
     return sorted(ranking, key=lambda x: x["puntos"], reverse=True)
+
+
+@router.get("/global/{temporada}/ranking")
+def ranking_global(temporada: int, db: Session = Depends(get_db)):
+    """Ranking de TODOS los usuarios con equipo o pronósticos esa temporada, sin depender de unirse a ninguna liga."""
+    ids_con_equipo = db.query(Equipo.usuario_id).filter(Equipo.temporada == temporada).distinct()
+    ids_con_pronostico = db.query(Pronostico.usuario_id).filter(Pronostico.temporada == temporada).distinct()
+    usuario_ids = {row[0] for row in ids_con_equipo} | {row[0] for row in ids_con_pronostico}
+
+    ranking = []
+    for uid in usuario_ids:
+        usuario = db.query(Usuario).filter(Usuario.id == uid).first()
+        if not usuario:
+            continue
+        total = puntos_totales_usuario(uid, temporada, db)
+        ranking.append({"usuario": usuario.nombre, "puntos": total})
+
+    return sorted(ranking, key=lambda x: x["puntos"], reverse=True)
+
 
 @router.get("/", response_model=list[LigaResponse])
 def ligas_publicas(db: Session = Depends(get_db)):

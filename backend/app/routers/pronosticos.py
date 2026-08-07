@@ -1,10 +1,12 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
+from datetime import date
 from app.core.database import get_db
+from app.core.security import get_admin_actual
 from app.models.pronostico import Pronostico
+from app.models.carrera import Carrera
 from app.schemas.pronostico import PronosticoCreate, PronosticoResponse
 from app.services.pronosticos import calcular_puntos_pronostico
-from app.core.security import get_admin_actual
 
 router = APIRouter(prefix="/pronosticos", tags=["pronosticos"])
 
@@ -18,6 +20,17 @@ def crear_pronostico(pronostico: PronosticoCreate, db: Session = Depends(get_db)
     ).first()
     if existente:
         raise HTTPException(status_code=400, detail="Ya tienes pronósticos para esta temporada")
+
+    primera_carrera = db.query(Carrera).filter(
+        Carrera.temporada == pronostico.temporada
+    ).order_by(Carrera.fecha).first()
+
+    if primera_carrera and date.today() >= primera_carrera.fecha:
+        raise HTTPException(
+            status_code=400,
+            detail=f"El plazo para pronósticos cerró el {primera_carrera.fecha.strftime('%d/%m/%Y')}, al empezar la temporada"
+        )
+
     nuevo = Pronostico(**pronostico.model_dump())
     db.add(nuevo)
     db.commit()
