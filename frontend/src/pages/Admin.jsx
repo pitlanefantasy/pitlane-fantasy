@@ -43,9 +43,11 @@ function Admin() {
     setMensaje(null);
     setGuardando(true);
 
-    // 1. Guardar cada resultado
-    try {
-      for (const r of resultadosValidos) {
+    // 1. Guardar cada resultado, sin parar el bucle si uno falla
+    const errores = [];
+    let guardadosOk = 0;
+    for (const r of resultadosValidos) {
+      try {
         await api.post('/resultados/', {
           carrera_id: r.carrera_id,
           piloto_id: r.piloto_id,
@@ -55,20 +57,25 @@ function Admin() {
           abandono: r.abandono,
           hizo_pole: r.hizo_pole,
         });
+        guardadosOk++;
+      } catch (err) {
+        const detalle = err.response?.data?.detail || 'Error desconocido';
+        errores.push(`${r.piloto_nombre}: ${detalle}`);
       }
-    } catch (err) {
-      const detalle = err.response?.data?.detail || 'Error al guardar resultados';
-      setMensaje({ tipo: 'error', texto: `❌ ${detalle}` });
+    }
+
+    if (guardadosOk === 0 && errores.length > 0) {
+      setMensaje({ tipo: 'error', texto: `❌ No se guardó ningún resultado.\n${errores.join('\n')}` });
       setGuardando(false);
       return;
     }
 
-    // 2. Recalcular precios y puntos de equipos
+    // 2. Recalcular precios y puntos de equipos (solo si se guardó al menos uno)
     try {
       await api.post(`/resultados/${carreraId}/calcular-precios`);
       await api.post(`/resultados/${carreraId}/calcular-equipos`);
     } catch (err) {
-      setMensaje({ tipo: 'error', texto: '⚠️ Resultados guardados, pero falló el recálculo de precios/equipos' });
+      setMensaje({ tipo: 'error', texto: `⚠️ ${guardadosOk} resultados guardados, pero falló el recálculo de precios/equipos` });
       setGuardando(false);
       return;
     }
@@ -79,13 +86,20 @@ function Admin() {
       await api.post(`/pronosticos/calcular/${carreraSeleccionada.temporada}`);
     } catch (err) {
       if (err.response?.status !== 404) {
-        setMensaje({ tipo: 'error', texto: '⚠️ Resultados y equipos recalculados, pero falló el recálculo de pronósticos' });
+        setMensaje({ tipo: 'error', texto: `⚠️ ${guardadosOk} resultados y equipos recalculados, pero falló el recálculo de pronósticos` });
         setGuardando(false);
         return;
       }
     }
 
-    setMensaje({ tipo: 'exito', texto: '✅ Resultados guardados y puntos recalculados correctamente' });
+    if (errores.length > 0) {
+      setMensaje({
+        tipo: 'aviso',
+        texto: `⚠️ ${guardadosOk} resultados guardados y recalculados. ${errores.length} fallaron:\n${errores.join('\n')}`,
+      });
+    } else {
+      setMensaje({ tipo: 'exito', texto: `✅ ${guardadosOk} resultados guardados y puntos recalculados correctamente` });
+    }
     setGuardando(false);
   };
 
@@ -160,7 +174,11 @@ function Admin() {
         </button>
       )}
       {mensaje && (
-        <p style={{ color: mensaje.tipo === 'exito' ? 'green' : '#c0392b', fontWeight: 'bold' }}>
+        <p style={{
+          color: mensaje.tipo === 'exito' ? 'green' : mensaje.tipo === 'aviso' ? '#b8860b' : '#c0392b',
+          fontWeight: 'bold',
+          whiteSpace: 'pre-line',
+        }}>
           {mensaje.texto}
         </p>
       )}
