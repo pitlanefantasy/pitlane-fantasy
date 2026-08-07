@@ -16,7 +16,6 @@ def generar_codigo():
 
 
 def puntos_totales_usuario(usuario_id: int, temporada: int, db: Session) -> float:
-    """Suma puntos de equipo (todos los GP de la temporada) + pronósticos de esa temporada."""
     equipos = db.query(Equipo).filter(
         Equipo.usuario_id == usuario_id,
         Equipo.temporada == temporada
@@ -39,6 +38,12 @@ def crear_liga(liga: LigaCreate, db: Session = Depends(get_db)):
     db.add(nueva)
     db.commit()
     db.refresh(nueva)
+
+    # El creador se une automáticamente a su propia liga
+    if nueva.creador_id:
+        db.add(LigaUsuario(liga_id=nueva.id, usuario_id=nueva.creador_id))
+        db.commit()
+
     return nueva
 
 
@@ -59,6 +64,14 @@ def unirse_liga(codigo: str, usuario_id: int, db: Session = Depends(get_db)):
     return {"mensaje": f"Te has unido a {liga.nombre}", "codigo": codigo}
 
 
+@router.get("/{liga_id}", response_model=LigaResponse)
+def obtener_liga(liga_id: int, db: Session = Depends(get_db)):
+    liga = db.query(Liga).filter(Liga.id == liga_id).first()
+    if not liga:
+        raise HTTPException(status_code=404, detail="Liga no encontrada")
+    return liga
+
+
 @router.get("/{liga_id}/ranking")
 def ranking_liga(liga_id: int, db: Session = Depends(get_db)):
     liga = db.query(Liga).filter(Liga.id == liga_id).first()
@@ -77,7 +90,6 @@ def ranking_liga(liga_id: int, db: Session = Depends(get_db)):
 
 @router.get("/global/{temporada}/ranking")
 def ranking_global(temporada: int, db: Session = Depends(get_db)):
-    """Ranking de TODOS los usuarios con equipo o pronósticos esa temporada, sin depender de unirse a ninguna liga."""
     ids_con_equipo = db.query(Equipo.usuario_id).filter(Equipo.temporada == temporada).distinct()
     ids_con_pronostico = db.query(Pronostico.usuario_id).filter(Pronostico.temporada == temporada).distinct()
     usuario_ids = {row[0] for row in ids_con_equipo} | {row[0] for row in ids_con_pronostico}
