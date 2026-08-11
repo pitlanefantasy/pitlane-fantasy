@@ -3,7 +3,7 @@ from datetime import datetime
 
 # Datos para crear un usuario (lo que llega de la web)
 class UsuarioCreate(BaseModel):
-    email: str
+    email: EmailStr
     nombre: str
     password: str
 
