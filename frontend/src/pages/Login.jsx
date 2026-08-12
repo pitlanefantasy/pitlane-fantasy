@@ -49,6 +49,10 @@ export default function Login() {
           className="w-full border border-pit-muted/30 rounded px-3 py-2 text-sm focus:outline-none focus:border-pit-red"
         />
 
+        <Link to="/olvide-password" className="block text-right text-xs text-pit-muted mt-2 hover:text-pit-red hover:underline">
+          ¿Olvidaste tu contraseña?
+        </Link>
+
         {error && <p className="text-pit-down text-sm mt-3">{error}</p>}
 
         <button

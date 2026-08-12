@@ -2,6 +2,16 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../services/api';
 
+function extraerError(err) {
+  const detail = err.response?.data?.detail;
+  if (!detail) return 'Error al registrarse. Inténtalo de nuevo.';
+  if (typeof detail === 'string') return detail;
+  if (Array.isArray(detail)) {
+    return detail.map(e => e.msg.replace('Value error, ', '')).join('. ');
+  }
+  return 'Error al registrarse. Inténtalo de nuevo.';
+}
+
 export default function Registro() {
   const [nombre, setNombre] = useState('');
   const [email, setEmail] = useState('');
@@ -17,7 +27,7 @@ export default function Registro() {
       await api.post('/usuarios/', { email, nombre, password });
       window.location.href = '/login';
     } catch (err) {
-      setError('Error al registrarse. El email puede estar en uso.');
+      setError(extraerError(err));
     } finally {
       setCargando(false);
     }
@@ -47,6 +57,7 @@ export default function Registro() {
           type="password" required value={password} onChange={e => setPassword(e.target.value)}
           className="w-full border border-pit-muted/30 rounded px-3 py-2 text-sm focus:outline-none focus:border-pit-red"
         />
+        <p className="text-xs text-pit-muted mt-1">Mínimo 8 caracteres. Evita contraseñas comunes (fechas, "password", etc.).</p>
 
         {error && <p className="text-pit-down text-sm mt-3">{error}</p>}
 

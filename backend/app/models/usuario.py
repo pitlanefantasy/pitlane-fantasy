@@ -12,4 +12,8 @@ class Usuario(Base):
     email_verificado               = Column(Boolean, default=False, nullable=False)
     token_verificacion             = Column(String(64), nullable=True)
     intentos_login_sin_verificar   = Column(Integer, default=0, nullable=False)
+    token_reset_password           = Column(String(64), nullable=True)
+    token_reset_expira             = Column(DateTime, nullable=True)
+    intentos_login_fallidos        = Column(Integer, default=0, nullable=False)
+    bloqueado_hasta                = Column(DateTime, nullable=True)
     created_at                     = Column(DateTime, server_default=func.now())
