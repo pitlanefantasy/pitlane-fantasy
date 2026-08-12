@@ -9,8 +9,12 @@ export default function ProximoGP({ carrera }) {
     day: 'numeric', month: 'long', year: 'numeric',
   });
 
+  const tieneCurvas = circuito && circuito.curvas_izquierda != null && circuito.curvas_derecha != null;
+  const tieneVelocidad = circuito && circuito.velocidad_max_kmh != null;
+  const tieneGanadores = circuito && (circuito.ultimo_ganador_motogp || circuito.ultimo_ganador_moto2 || circuito.ultimo_ganador_moto3);
+
   return (
-    <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-8">
+    <div className="flex flex-col md:flex-row justify-between items-start gap-8">
       <div>
         <p className="text-pit-red text-sm font-display font-bold uppercase tracking-widest">
           Próximo GP
@@ -19,9 +23,8 @@ export default function ProximoGP({ carrera }) {
           {carrera.circuito}
         </h1>
         <h2 className="font-display text-xl text-pit-muted uppercase mt-1">
-          {carrera.pais} — {fecha}
+          {circuito?.ubicacion || carrera.pais} — {fecha}
         </h2>
-
         <div className="bg-pit-ink rounded-lg px-6 py-5 mt-6 inline-block">
           <StartLights active={5} />
           {ended ? (
@@ -35,21 +38,56 @@ export default function ProximoGP({ carrera }) {
             </div>
           )}
         </div>
-
-        {circuito && (
-          <div className="mt-6 flex gap-6 text-pit-muted text-xs font-mono uppercase tracking-wide">
-            <span>{circuito.curvas_izquierda}i / {circuito.curvas_derecha}d</span>
-            <span>{circuito.velocidad_max_kmh} km/h máx</span>
-          </div>
-        )}
       </div>
 
       {circuito && (
-        <TrazadoCircuito
-          slug={circuito.slug}
-          curvasIzquierda={circuito.curvas_izquierda}
-          curvasDerecha={circuito.curvas_derecha}
-        />
+        <div className="bg-white rounded-lg border border-pit-muted/20 p-6 w-full md:w-80 flex-shrink-0">
+          <p className="text-pit-red text-xs font-display font-bold uppercase tracking-widest">
+            Ficha del circuito
+          </p>
+
+          {circuito.slug && (
+            <div className="flex justify-center mt-4">
+              <TrazadoCircuito
+                slug={circuito.slug}
+                curvasIzquierda={circuito.curvas_izquierda}
+                curvasDerecha={circuito.curvas_derecha}
+              />
+            </div>
+          )}
+
+          {(tieneCurvas || tieneVelocidad) && (
+            <div className="flex justify-center gap-6 text-pit-ink text-sm font-mono uppercase tracking-wide mt-4 pt-4 border-t border-pit-muted/10">
+              {tieneCurvas && (
+                <span>
+                  <span className="text-pit-up font-bold">{circuito.curvas_izquierda}I</span>
+                  {' / '}
+                  <span className="text-pit-down font-bold">{circuito.curvas_derecha}D</span>
+                </span>
+              )}
+              {tieneVelocidad && <span className="font-bold">{circuito.velocidad_max_kmh} km/h máx</span>}
+            </div>
+          )}
+
+          {tieneGanadores && (
+            <div className="mt-4 pt-4 border-t border-pit-muted/10">
+              <p className="text-pit-muted text-xs font-display uppercase tracking-widest mb-2">
+                Último ganador
+              </p>
+              <div className="space-y-1 text-sm">
+                {circuito.ultimo_ganador_motogp && (
+                  <p><span className="text-pit-muted">MotoGP:</span> <span className="font-bold text-pit-ink">{circuito.ultimo_ganador_motogp}</span></p>
+                )}
+                {circuito.ultimo_ganador_moto2 && (
+                  <p><span className="text-pit-muted">Moto2:</span> <span className="font-bold text-pit-ink">{circuito.ultimo_ganador_moto2}</span></p>
+                )}
+                {circuito.ultimo_ganador_moto3 && (
+                  <p><span className="text-pit-muted">Moto3:</span> <span className="font-bold text-pit-ink">{circuito.ultimo_ganador_moto3}</span></p>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
       )}
     </div>
   );
