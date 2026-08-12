@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: pitlane-api
-        image: europe-west1-docker.pkg.dev/pitlane-fantasy/pitlane-repo/pitlane-fantasy-api:v11
+        image: europe-west1-docker.pkg.dev/pitlane-fantasy/pitlane-repo/pitlane-fantasy-api:v14
         ports:
         - containerPort: 8000
         env:
@@ -40,6 +40,11 @@ spec:
             secretKeyRef:
               name: pitlane-secrets
               key: SECRET_KEY
+        - name: SENDGRID_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: pitlane-secrets
+              key: SENDGRID_API_KEY
         readinessProbe:
           httpGet:
             path: /health

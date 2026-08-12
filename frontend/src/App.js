@@ -7,6 +7,7 @@ import Equipo from './pages/Equipo';
 import Ranking from './pages/Ranking';
 import Ligas from './pages/Ligas';
 import RankingLiga from './pages/RankingLiga';
+import Verificar from './pages/Verificar';
 import Pronosticos from './pages/Pronosticos';
 import Admin from './pages/Admin';
 import RutaProtegida from './components/RutaProtegida';
@@ -27,6 +28,7 @@ function App() {
           <Route path="/ranking" element={<RutaProtegida><Ranking /></RutaProtegida>} />
           <Route path="/ligas" element={<RutaProtegida><Ligas /></RutaProtegida>} />
           <Route path="/ranking-liga/:ligaId" element={<RutaProtegida><RankingLiga /></RutaProtegida>} />
+          <Route path="/verificar/:token" element={<Verificar />} />
           <Route path="/pronosticos" element={<RutaProtegida><Pronosticos /></RutaProtegida>} />
           <Route path="/admin" element={<RutaProtegida soloAdmin><Admin /></RutaProtegida>} />
         </Route>

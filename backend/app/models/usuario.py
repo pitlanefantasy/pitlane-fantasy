@@ -4,9 +4,12 @@ from app.core.database import Base
 
 class Usuario(Base):
     __tablename__ = "usuarios"
-    id            = Column(Integer, primary_key=True, index=True)
-    email         = Column(String(255), unique=True, nullable=False)
-    nombre        = Column(String(100), nullable=False)
-    password_hash = Column(String(255), nullable=False)
-    es_admin      = Column(Boolean, default=False, nullable=False)
-    created_at    = Column(DateTime, server_default=func.now())
+    id                             = Column(Integer, primary_key=True, index=True)
+    email                          = Column(String(255), unique=True, nullable=False)
+    nombre                         = Column(String(100), nullable=False)
+    password_hash                  = Column(String(255), nullable=False)
+    es_admin                       = Column(Boolean, default=False, nullable=False)
+    email_verificado               = Column(Boolean, default=False, nullable=False)
+    token_verificacion             = Column(String(64), nullable=True)
+    intentos_login_sin_verificar   = Column(Integer, default=0, nullable=False)
+    created_at                     = Column(DateTime, server_default=func.now())

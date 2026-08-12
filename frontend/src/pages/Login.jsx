@@ -20,10 +20,12 @@ export default function Login() {
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       });
       localStorage.setItem('token', response.data.access_token);
+      if (response.data.aviso) {
+        sessionStorage.setItem('avisoLogin', response.data.aviso);
+      }
       window.location.href = '/';
     } catch (err) {
-      setError('Email o contraseña incorrectos');
-    } finally {
+      setError(err.response?.data?.detail || 'Email o contraseña incorrectos');
       setCargando(false);
     }
   };
