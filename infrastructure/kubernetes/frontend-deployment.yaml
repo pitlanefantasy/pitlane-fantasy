@@ -14,9 +14,23 @@ spec:
     spec:
       containers:
       - name: pitlane-frontend
-        image: europe-west1-docker.pkg.dev/pitlane-fantasy/pitlane-repo/pitlane-frontend:v10
+        image: europe-west1-docker.pkg.dev/pitlane-fantasy/pitlane-repo/pitlane-frontend:v11
         ports:
         - containerPort: 80
+        - containerPort: 443
+        volumeMounts:
+        - name: tls-certs
+          mountPath: /etc/nginx/certs
+          readOnly: true
+      volumes:
+      - name: tls-certs
+        secret:
+          secretName: pitlane-tls-origin
+          items:
+          - key: tls.crt
+            path: tls.crt
+          - key: tls.key
+            path: tls.key
 ---
 apiVersion: v1
 kind: Service
@@ -27,5 +41,9 @@ spec:
   selector:
     app: pitlane-frontend
   ports:
-  - port: 80
+  - name: http
+    port: 80
     targetPort: 80
+  - name: https
+    port: 443
+    targetPort: 443
