@@ -23,7 +23,7 @@ export default function Home() {
           El fantasy que une <span className="text-pit-red font-bold">MotoGP, Moto2 y Moto3</span> en un solo equipo.
         </p>
         <p className="text-pit-muted text-sm max-w-xl mt-2">
-          Pronostica al campeón, al mejor rookie, quién hará más poles y quién se llevará más caídas. Entra y vive el mejor fantasy de motos.
+          Pronostica al campeón, al mejor rookie, quién hará más poles y quién ganará más carreras. Entra y vive el mejor fantasy de motos.
         </p>
 
         <section className="pt-8">
@@ -41,7 +41,7 @@ export default function Home() {
             <div className="bg-white rounded-lg p-6 border border-pit-muted/20">
               <p className="text-pit-red text-xs font-display uppercase tracking-widest">Toda la temporada</p>
               <p className="font-display font-bold text-lg text-pit-ink mt-1">Pronósticos de temporada</p>
-              <p className="text-pit-muted text-sm mt-2">Campeón, poles, victorias, rookie y caídas — se suman a tu puntuación total del año.</p>
+              <p className="text-pit-muted text-sm mt-2">Campeón, poles, victorias y rookie — se suman a tu puntuación total del año.</p>
             </div>
           </div>
           <Link to="/reglas" className="inline-block text-pit-red font-display text-sm uppercase tracking-wide mt-6 hover:underline">

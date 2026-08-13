@@ -21,10 +21,11 @@ export default function Navbar() {
       </Link>
       <div className="flex gap-6 text-sm text-pit-muted font-display uppercase tracking-wide">
         <Link to="/" className="hover:text-pit-ink">Inicio</Link>
+        <Link to="/equipo" className="hover:text-pit-ink">Mi equipo</Link>
+        <Link to="/pronosticos" className="hover:text-pit-ink">Pronósticos</Link>
         <Link to="/ranking" className="hover:text-pit-ink">Ranking</Link>
         <Link to="/ligas" className="hover:text-pit-ink">Ligas</Link>
       </div>
-
       {usuario ? (
         <div className="flex items-center gap-4">
           <span className="text-sm text-pit-muted">{usuario.nombre || usuario.sub}</span>

@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
-from app.routers import usuarios, pilotos, carreras, equipos, pronosticos, resultados, ligas
+from app.routers import usuarios, pilotos, carreras, equipos, pronosticos, resultados, ligas, fabricantes
 import os
 
 load_dotenv()
@@ -34,6 +34,7 @@ app.include_router(equipos.router)
 app.include_router(pronosticos.router)
 app.include_router(resultados.router)
 app.include_router(ligas.router)
+app.include_router(fabricantes.router)
 
 @app.get("/")
 def root():

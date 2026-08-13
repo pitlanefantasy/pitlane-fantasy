@@ -6,32 +6,27 @@ class EquipoCreate(BaseModel):
     usuario_id: int
     carrera_id: int
     temporada: int
-
     # MotoGP
     motogp_oro1_id: int
     motogp_oro2_id: int
     motogp_plata1_id: int
     motogp_plata2_id: int
-    equipo_nombre: Optional[int] = None
-    constructor_nombre: Optional[int] = None
-
+    fabricante_id: Optional[int] = None
+    equipo_real_id: Optional[int] = None
     # Moto2
     moto2_oro1_id: int
     moto2_oro2_id: int
     moto2_plata1_id: int
     moto2_plata2_id: int
-
     # Moto3
     moto3_oro1_id: int
     moto3_oro2_id: int
     moto3_plata1_id: int
     moto3_plata2_id: int
-
     # Capitanes por categoría
     capitan_motogp_id: Optional[int] = None
     capitan_moto2_id: Optional[int] = None
     capitan_moto3_id: Optional[int] = None
-
     # Comodín y predicciones
     comodin_usado: bool = False
     pole_motogp_id: Optional[int] = None

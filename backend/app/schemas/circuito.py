@@ -13,6 +13,7 @@ class CircuitoResponse(BaseModel):
     ultimo_ganador_motogp: Optional[str] = None
     ultimo_ganador_moto2: Optional[str] = None
     ultimo_ganador_moto3: Optional[str] = None
+    historia: Optional[str] = None
 
     class Config:
         from_attributes = True

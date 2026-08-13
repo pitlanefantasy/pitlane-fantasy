@@ -1,5 +1,4 @@
 import StartLights from './StartLights';
-import TrazadoCircuito from './TrazadoCircuito';
 import useCountdown from '../hooks/useCountdown';
 
 export default function ProximoGP({ carrera }) {
@@ -14,7 +13,7 @@ export default function ProximoGP({ carrera }) {
   const tieneGanadores = circuito && (circuito.ultimo_ganador_motogp || circuito.ultimo_ganador_moto2 || circuito.ultimo_ganador_moto3);
 
   return (
-    <div className="flex flex-col md:flex-row justify-between items-start gap-8">
+    <div>
       <div>
         <p className="text-pit-red text-sm font-display font-bold uppercase tracking-widest">
           Próximo GP
@@ -40,53 +39,60 @@ export default function ProximoGP({ carrera }) {
         </div>
       </div>
 
-      {circuito && (
-        <div className="bg-white rounded-lg border border-pit-muted/20 p-6 w-full md:w-80 flex-shrink-0">
-          <p className="text-pit-red text-xs font-display font-bold uppercase tracking-widest">
-            Ficha del circuito
+      {circuito && (tieneCurvas || tieneVelocidad || tieneGanadores || circuito.historia) && (
+        <div className="bg-white rounded-lg border border-pit-muted/20 p-8 mt-8">
+          <p className="text-pit-red text-xs font-display font-bold uppercase tracking-widest mb-6">
+            Especificaciones principales
           </p>
 
-          {circuito.slug && (
-            <div className="flex justify-center mt-4">
-              <TrazadoCircuito
-                slug={circuito.slug}
-                curvasIzquierda={circuito.curvas_izquierda}
-                curvasDerecha={circuito.curvas_derecha}
-              />
-            </div>
-          )}
-
-          {(tieneCurvas || tieneVelocidad) && (
-            <div className="flex justify-center gap-6 text-pit-ink text-sm font-mono uppercase tracking-wide mt-4 pt-4 border-t border-pit-muted/10">
-              {tieneCurvas && (
-                <span>
-                  <span className="text-pit-up font-bold">{circuito.curvas_izquierda}I</span>
-                  {' / '}
-                  <span className="text-pit-down font-bold">{circuito.curvas_derecha}D</span>
-                </span>
-              )}
-              {tieneVelocidad && <span className="font-bold">{circuito.velocidad_max_kmh} km/h máx</span>}
-            </div>
-          )}
-
-          {tieneGanadores && (
-            <div className="mt-4 pt-4 border-t border-pit-muted/10">
-              <p className="text-pit-muted text-xs font-display uppercase tracking-widest mb-2">
-                Último ganador
-              </p>
-              <div className="space-y-1 text-sm">
-                {circuito.ultimo_ganador_motogp && (
-                  <p><span className="text-pit-muted">MotoGP:</span> <span className="font-bold text-pit-ink">{circuito.ultimo_ganador_motogp}</span></p>
+          <div className="flex flex-col lg:flex-row gap-10">
+            {(tieneCurvas || tieneVelocidad || tieneGanadores) && (
+              <div className="flex-shrink-0 lg:w-64 space-y-5">
+                {tieneCurvas && (
+                  <div>
+                    <p className="text-pit-muted text-xs font-display uppercase tracking-widest">Curvas</p>
+                    <p className="font-display font-bold text-2xl text-pit-ink mt-1">
+                      {circuito.curvas_izquierda + circuito.curvas_derecha}
+                      <span className="text-base font-normal text-pit-muted ml-2">
+                        (<span className="text-pit-up font-bold">{circuito.curvas_izquierda}I</span> / <span className="text-pit-down font-bold">{circuito.curvas_derecha}D</span>)
+                      </span>
+                    </p>
+                  </div>
                 )}
-                {circuito.ultimo_ganador_moto2 && (
-                  <p><span className="text-pit-muted">Moto2:</span> <span className="font-bold text-pit-ink">{circuito.ultimo_ganador_moto2}</span></p>
+
+                {tieneVelocidad && (
+                  <div>
+                    <p className="text-pit-muted text-xs font-display uppercase tracking-widest">Velocidad máxima</p>
+                    <p className="font-display font-bold text-2xl text-pit-ink mt-1">{circuito.velocidad_max_kmh} km/h</p>
+                  </div>
                 )}
-                {circuito.ultimo_ganador_moto3 && (
-                  <p><span className="text-pit-muted">Moto3:</span> <span className="font-bold text-pit-ink">{circuito.ultimo_ganador_moto3}</span></p>
+
+                {tieneGanadores && (
+                  <div>
+                    <p className="text-pit-muted text-xs font-display uppercase tracking-widest">Último ganador</p>
+                    <div className="mt-1 space-y-0.5 text-sm">
+                      {circuito.ultimo_ganador_motogp && (
+                        <p><span className="text-pit-muted">MotoGP:</span> <span className="font-bold text-pit-ink">{circuito.ultimo_ganador_motogp}</span></p>
+                      )}
+                      {circuito.ultimo_ganador_moto2 && (
+                        <p><span className="text-pit-muted">Moto2:</span> <span className="font-bold text-pit-ink">{circuito.ultimo_ganador_moto2}</span></p>
+                      )}
+                      {circuito.ultimo_ganador_moto3 && (
+                        <p><span className="text-pit-muted">Moto3:</span> <span className="font-bold text-pit-ink">{circuito.ultimo_ganador_moto3}</span></p>
+                      )}
+                    </div>
+                  </div>
                 )}
               </div>
-            </div>
-          )}
+            )}
+
+            {circuito.historia && (
+              <div className="flex-1 border-t lg:border-t-0 lg:border-l border-pit-muted/10 pt-6 lg:pt-0 lg:pl-10">
+                <p className="text-pit-muted text-xs font-display uppercase tracking-widest mb-2">Historia</p>
+                <p className="text-base text-pit-ink leading-relaxed">{circuito.historia}</p>
+              </div>
+            )}
+          </div>
         </div>
       )}
     </div>

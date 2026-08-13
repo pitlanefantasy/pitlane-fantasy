@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Column, Integer, String, Text
 from app.core.database import Base
 
 class Circuito(Base):
@@ -14,3 +14,4 @@ class Circuito(Base):
     ultimo_ganador_motogp = Column(String(100), nullable=True)
     ultimo_ganador_moto2  = Column(String(100), nullable=True)
     ultimo_ganador_moto3  = Column(String(100), nullable=True)
+    historia               = Column(Text, nullable=True)

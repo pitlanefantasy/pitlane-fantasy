@@ -27,8 +27,8 @@ export default function Reglas() {
         <p className="text-pit-muted text-sm mb-6">
           Al inicio de la temporada predices quién se llevará cada categoría. Los aciertos suman directamente a tu puntuación total, además de lo que consigas con tu equipo semanal.
         </p>
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-          {['Campeón, 2º y 3º', 'Más poles', 'Más victorias', 'Mejor rookie', 'Más caídas'].map(t => (
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {['Campeón, 2º y 3º', 'Más poles', 'Más victorias', 'Mejor rookie'].map(t => (
             <div key={t} className="border border-pit-muted/30 rounded-lg p-4 text-center">
               <p className="font-display font-bold text-sm text-pit-ink uppercase">{t}</p>
             </div>

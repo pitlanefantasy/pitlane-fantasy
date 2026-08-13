@@ -11,7 +11,6 @@ function Pronosticos() {
     poleman_motogp_id: '', poleman_moto2_id: '', poleman_moto3_id: '',
     victorias_motogp_id: '', victorias_moto2_id: '', victorias_moto3_id: '',
     rookie_motogp_id: '', rookie_moto2_id: '', rookie_moto3_id: '',
-    caidas_motogp_id: '', caidas_moto2_id: '', caidas_moto3_id: '',
   });
   const [mensaje, setMensaje] = useState('');
 
@@ -85,11 +84,6 @@ function Pronosticos() {
       {sel('Mejor rookie MotoGP', 'rookie_motogp_id', rookies.MotoGP, 50)}
       {sel('Mejor rookie Moto2', 'rookie_moto2_id', rookies.Moto2, 35)}
       {sel('Mejor rookie Moto3', 'rookie_moto3_id', rookies.Moto3, 35)}
-
-      <h2>💥 Más Caídas</h2>
-      {sel('Más caídas MotoGP', 'caidas_motogp_id', pilotos.MotoGP, 30)}
-      {sel('Más caídas Moto2', 'caidas_moto2_id', pilotos.Moto2, 20)}
-      {sel('Más caídas Moto3', 'caidas_moto3_id', pilotos.Moto3, 20)}
 
       <br />
       <button onClick={handleGuardar} style={{ padding: '10px 30px', fontSize: '16px' }}>
