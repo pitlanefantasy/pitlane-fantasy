@@ -6,6 +6,7 @@ import Registro from './pages/Registro';
 import Equipo from './pages/Equipo';
 import Ranking from './pages/Ranking';
 import Ligas from './pages/Ligas';
+import Resultados from './pages/Resultados';
 import RankingLiga from './pages/RankingLiga';
 import Verificar from './pages/Verificar';
 import OlvidePassword from './pages/OlvidePassword';
@@ -29,6 +30,7 @@ function App() {
           <Route path="/equipo" element={<RutaProtegida><Equipo /></RutaProtegida>} />
           <Route path="/ranking" element={<RutaProtegida><Ranking /></RutaProtegida>} />
           <Route path="/ligas" element={<RutaProtegida><Ligas /></RutaProtegida>} />
+          <Route path="/resultados" element={<Resultados />} />
           <Route path="/ranking-liga/:ligaId" element={<RutaProtegida><RankingLiga /></RutaProtegida>} />
           <Route path="/verificar/:token" element={<Verificar />} />
           <Route path="/olvide-password" element={<OlvidePassword />} />

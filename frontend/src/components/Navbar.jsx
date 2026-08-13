@@ -23,6 +23,7 @@ export default function Navbar() {
         <Link to="/" className="hover:text-pit-ink">Inicio</Link>
         <Link to="/equipo" className="hover:text-pit-ink">Mi equipo</Link>
         <Link to="/pronosticos" className="hover:text-pit-ink">Pronósticos</Link>
+        <Link to="/resultados" className="hover:text-pit-ink">Resultados</Link>
         <Link to="/ranking" className="hover:text-pit-ink">Ranking</Link>
         <Link to="/ligas" className="hover:text-pit-ink">Ligas</Link>
       </div>

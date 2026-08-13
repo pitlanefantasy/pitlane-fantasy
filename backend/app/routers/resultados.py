@@ -3,12 +3,15 @@ from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.core.security import get_admin_actual
 from app.models.resultado import Resultado
+from app.models.piloto import Piloto
+from app.models.carrera import Carrera
 from app.schemas.resultado import ResultadoCreate, ResultadoResponse
 from app.services.puntos import calcular_puntos_carrera, calcular_puntos_sprint
 from app.services.precios import actualizar_precios
 from typing import List
 
 router = APIRouter(prefix="/resultados", tags=["resultados"])
+
 
 @router.post("/", response_model=ResultadoResponse)
 def crear_resultado(
@@ -40,14 +43,52 @@ def crear_resultado(
     db.refresh(nuevo)
     return nuevo
 
+
+@router.get("/publico/temporada/{temporada}")
+def resultados_temporada_publico(temporada: int, db: Session = Depends(get_db)):
+    """Calendario completo de la temporada para la vista pública de
+    Resultados: cada carrera, con sus resultados si ya los hay (lista
+    vacía si aún no se ha disputado o no se ha cargado el resultado)."""
+    carreras = db.query(Carrera).filter(Carrera.temporada == temporada).order_by(Carrera.fecha).all()
+
+    salida = []
+    for carrera in carreras:
+        resultados = (
+            db.query(Resultado, Piloto)
+            .join(Piloto, Resultado.piloto_id == Piloto.id)
+            .filter(Resultado.carrera_id == carrera.id)
+            .order_by(Resultado.posicion_carrera.asc().nullslast())
+            .all()
+        )
+        salida.append({
+            "carrera_id": carrera.id,
+            "nombre": carrera.nombre,
+            "circuito": carrera.circuito,
+            "pais": carrera.pais,
+            "fecha": carrera.fecha,
+            "tiene_resultado": len(resultados) > 0,
+            "resultados": [
+                {
+                    "piloto_id": piloto.id,
+                    "piloto_nombre": piloto.nombre,
+                    "categoria": piloto.categoria,
+                    "posicion_carrera": resultado.posicion_carrera,
+                    "posicion_sprint": resultado.posicion_sprint,
+                    "abandono": resultado.abandono,
+                    "vuelta_rapida": resultado.vuelta_rapida,
+                    "hizo_pole": resultado.hizo_pole,
+                    "puntos_total": float(resultado.puntos_total or 0),
+                }
+                for resultado, piloto in resultados
+            ],
+        })
+    return salida
+
+
 @router.get("/{carrera_id}", response_model=List[ResultadoResponse])
 def resultados_carrera(carrera_id: int, db: Session = Depends(get_db)):
-    resultados = db.query(Resultado).filter(
-        Resultado.carrera_id == carrera_id
-    ).all()
-    if not resultados:
-        raise HTTPException(status_code=404, detail="No hay resultados para esta carrera")
-    return resultados
+    return db.query(Resultado).filter(Resultado.carrera_id == carrera_id).all()
+
 
 @router.get("/{carrera_id}/{piloto_id}", response_model=ResultadoResponse)
 def resultado_piloto(carrera_id: int, piloto_id: int, db: Session = Depends(get_db)):
@@ -59,6 +100,7 @@ def resultado_piloto(carrera_id: int, piloto_id: int, db: Session = Depends(get_
         raise HTTPException(status_code=404, detail="Resultado no encontrado")
     return resultado
 
+
 @router.post("/{carrera_id}/calcular-precios")
 def calcular_precios(
     carrera_id: int,
@@ -67,6 +109,7 @@ def calcular_precios(
 ):
     actualizar_precios(carrera_id, db)
     return {"mensaje": f"Precios actualizados tras carrera {carrera_id}"}
+
 
 @router.post("/{carrera_id}/calcular-equipos")
 def calcular_puntos_equipos(

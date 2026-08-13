@@ -35,8 +35,6 @@ export default function Equipo() {
   const [fabricantes, setFabricantes] = useState([]);
   const [equiposReales, setEquiposReales] = useState([]);
   const [boostsUsados, setBoostsUsados] = useState({ MotoGP: 0, Moto2: 0, Moto3: 0 });
-  // yaGuardado: si ya existe un equipo para ESTA carrera (decide crear vs actualizar)
-  // anterior: equipo de la carrera previa, solo para comparar y contar cambios
   const [yaGuardado, setYaGuardado] = useState(undefined);
   const [anterior, setAnterior] = useState(null);
   const [equipo, setEquipo] = useState(EQUIPO_VACIO);
@@ -59,8 +57,6 @@ export default function Equipo() {
             setEquipo(copiarAFormulario(guardado));
             setYaGuardado(true);
           } else if (previo) {
-            // No hay equipo propio todavía para esta carrera, pero sí de la
-            // anterior: precargamos con ese, como punto de partida a editar.
             setEquipo(copiarAFormulario(previo));
             setYaGuardado(false);
           } else {
@@ -124,6 +120,12 @@ export default function Equipo() {
     return nuevo;
   });
 
+  const handleVolverAnterior = () => {
+    if (!anterior) return;
+    setEquipo(copiarAFormulario(anterior));
+    setMensaje(null);
+  };
+
   const handleGuardar = async () => {
     const usuario = getUsuario();
     const camposObligatorios = Object.keys(equipo).filter(c => c.includes('_oro') || c.includes('_plata'));
@@ -168,7 +170,7 @@ export default function Equipo() {
         </p>
       )}
 
-      <div className="flex flex-wrap gap-3 mt-4">
+      <div className="flex flex-wrap items-center gap-3 mt-4">
         <div className={`inline-block rounded-lg px-5 py-3 font-mono ${sobrePresupuesto ? 'bg-pit-down-bg text-pit-down' : 'bg-pit-up-bg text-pit-up'}`}>
           {(PRESUPUESTO - presupuestoUsado).toFixed(1)}M restantes
           <span className="text-xs ml-2 opacity-70">({presupuestoUsado.toFixed(1)}M / {PRESUPUESTO}M usados)</span>
@@ -178,6 +180,15 @@ export default function Equipo() {
           <div className={`inline-block rounded-lg px-5 py-3 font-mono ${sobreCambios ? 'bg-pit-down-bg text-pit-down' : 'bg-pit-up-bg text-pit-up'}`}>
             {cambiosUsados} / {MAX_CAMBIOS} cambios usados
           </div>
+        )}
+
+        {!esPrimeraCarrera && anterior && cambiosUsados > 0 && (
+          <button
+            onClick={handleVolverAnterior}
+            className="text-sm font-display uppercase text-pit-muted hover:text-pit-red underline"
+          >
+            ← Volver al equipo anterior
+          </button>
         )}
       </div>
 
