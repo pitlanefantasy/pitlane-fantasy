@@ -15,3 +15,4 @@ class Circuito(Base):
     ultimo_ganador_moto2  = Column(String(100), nullable=True)
     ultimo_ganador_moto3  = Column(String(100), nullable=True)
     historia               = Column(Text, nullable=True)
+    imagen_url             = Column(String(300), nullable=True)

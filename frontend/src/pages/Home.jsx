@@ -36,7 +36,7 @@ export default function Home() {
             <div className="bg-white rounded-lg p-6 border border-pit-muted/20">
               <p className="text-pit-red text-xs font-display uppercase tracking-widest">Tu equipo</p>
               <p className="font-display font-bold text-lg text-pit-ink mt-1">Se arma una vez, evoluciona contigo</p>
-              <p className="text-pit-muted text-sm mt-2">12 pilotos, fabricante y equipo de MotoGP — hasta 5 cambios por Gran Premio, sin empezar de cero cada semana.</p>
+              <p className="text-pit-muted text-sm mt-2">2 Oro + 2 Plata por cada categoría (MotoGP, Moto2, Moto3), más fabricante y equipo de MotoGP — hasta 5 cambios por Gran Premio, sin empezar de cero cada semana.</p>
             </div>
             <div className="bg-white rounded-lg p-6 border border-pit-muted/20">
               <p className="text-pit-red text-xs font-display uppercase tracking-widest">Toda la temporada</p>

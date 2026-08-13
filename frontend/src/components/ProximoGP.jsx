@@ -4,9 +4,15 @@ import useCountdown from '../hooks/useCountdown';
 export default function ProximoGP({ carrera }) {
   const { days, hours, minutes, seconds, ended } = useCountdown(carrera.fecha);
   const circuito = carrera.circuito_detalle;
-  const fecha = new Date(carrera.fecha).toLocaleDateString('es-ES', {
-    day: 'numeric', month: 'long', year: 'numeric',
-  });
+
+  const fechaCarrera = new Date(carrera.fecha);
+  const fechaViernes = new Date(fechaCarrera);
+  fechaViernes.setDate(fechaCarrera.getDate() - 2);
+
+  const mismoMes = fechaViernes.getMonth() === fechaCarrera.getMonth();
+  const fecha = mismoMes
+    ? `${fechaViernes.getDate()}-${fechaCarrera.toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })}`
+    : `${fechaViernes.toLocaleDateString('es-ES', { day: 'numeric', month: 'long' })} - ${fechaCarrera.toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })}`;
 
   const tieneCurvas = circuito && circuito.curvas_izquierda != null && circuito.curvas_derecha != null;
   const tieneVelocidad = circuito && circuito.velocidad_max_kmh != null;
