@@ -10,13 +10,15 @@ export default function Reglas() {
         <h2 className="font-display text-sm uppercase tracking-widest text-pit-muted mb-6">
           Formato de tu equipo
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <ReglaCard color="bg-pit-best-bg text-pit-best" titulo="2 Oro + 2 Plata"
-            texto="Por cada categoría (MotoGP, Moto2, Moto3). Los Oro puntúan el doble que los Plata." />
+            texto="Por cada categoría (MotoGP, Moto2, Moto3). Los Oro puntúan el doble que los Plata. Además, en MotoGP eliges un Fabricante y un Equipo real." />
           <ReglaCard color="bg-pit-up-bg text-pit-up" titulo="1 Capitán por categoría"
             texto="Solo puedes usarlo 3 veces por temporada en cada categoría (3 en MotoGP, 3 en Moto2, 3 en Moto3)." />
-          <ReglaCard color="bg-pit-down-bg text-pit-down" titulo="Presupuesto limitado"
-            texto="Cada piloto tiene un precio que sube o baja según sus resultados recientes." />
+          <ReglaCard color="bg-pit-down-bg text-pit-down" titulo="Presupuesto de 75M"
+            texto="Cada piloto, fabricante y equipo tiene un precio que sube o baja según sus resultados recientes." />
+          <ReglaCard color="bg-pit-best-bg text-pit-best" titulo="Hasta 5 cambios por GP"
+            texto="Tu equipo se arma una vez y te acompaña toda la temporada — antes de cada Gran Premio puedes cambiar hasta 5 piezas (pilotos, fabricante o equipo)." />
         </div>
       </section>
 
@@ -25,7 +27,7 @@ export default function Reglas() {
           Pronósticos de temporada
         </h2>
         <p className="text-pit-muted text-sm mb-6">
-          Al inicio de la temporada predices quién se llevará cada categoría. Los aciertos suman directamente a tu puntuación total, además de lo que consigas con tu equipo semanal.
+          Al inicio de la temporada predices quién se llevará cada categoría. Los aciertos suman directamente a tu puntuación total, además de lo que consigas con tu equipo.
         </p>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {['Campeón, 2º y 3º', 'Más poles', 'Más victorias', 'Mejor rookie'].map(t => (
@@ -56,9 +58,9 @@ export default function Reglas() {
           Paso a paso
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <Paso n="1" texto="Elige tus 12 pilotos de MotoGP, Moto2 y Moto3 antes de que cierre cada Gran Premio." />
-          <Paso n="2" texto="Suman puntos según su resultado real en carrera, sprint y clasificación." />
-          <Paso n="3" texto="Compite en el ranking global o crea una liga privada con tus amigos." />
+          <Paso n="1" texto="Arma tu equipo la primera vez que juegues: 12 pilotos, fabricante y equipo de MotoGP, sin límite." />
+          <Paso n="2" texto="Antes de cada Gran Premio, ajusta hasta 5 piezas si quieres — el resto se mantiene tal cual." />
+          <Paso n="3" texto="Suman puntos según su resultado real en carrera, sprint y clasificación. Compite en el ranking global o crea una liga privada." />
         </div>
       </section>
     </div>
