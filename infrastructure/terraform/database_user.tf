@@ -1,5 +1,1 @@
-resource "google_sql_user" "pitlane_user" {
-    name     = "pitlane"
-    instance = google_sql_database_instance.pitlane_db.name
-    password = var.db_password
-}
+# Usuario de Cloud SQL eliminado junto con la instancia el 14 de agosto de 2026
