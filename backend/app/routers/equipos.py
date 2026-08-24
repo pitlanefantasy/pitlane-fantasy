@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.core.database import get_db
+from app.core.security import get_usuario_actual
 from app.models.equipo import Equipo
 from app.models.carrera import Carrera
 from app.models.piloto import Piloto
@@ -124,7 +125,9 @@ def validar_cambios(equipo: EquipoCreate, anterior: Equipo):
 
 
 @router.post("/", response_model=EquipoResponse)
-def crear_equipo(equipo: EquipoCreate, db: Session = Depends(get_db)):
+def crear_equipo(equipo: EquipoCreate, db: Session = Depends(get_db), usuario_actual: dict = Depends(get_usuario_actual)):
+    if equipo.usuario_id != usuario_actual.get("id") and not usuario_actual.get("es_admin"):
+        raise HTTPException(status_code=403, detail="No puedes crear equipo para otro usuario")
     existente = db.query(Equipo).filter(
         Equipo.usuario_id == equipo.usuario_id,
         Equipo.carrera_id == equipo.carrera_id
@@ -147,11 +150,13 @@ def crear_equipo(equipo: EquipoCreate, db: Session = Depends(get_db)):
 
 
 @router.put("/{usuario_id}/{carrera_id}", response_model=EquipoResponse)
-def actualizar_equipo(usuario_id: int, carrera_id: int, equipo: EquipoCreate, db: Session = Depends(get_db)):
+def actualizar_equipo(usuario_id: int, carrera_id: int, equipo: EquipoCreate, db: Session = Depends(get_db), usuario_actual: dict = Depends(get_usuario_actual)):
     """Actualiza el equipo ya guardado para esta carrera concreta — para
     seguir afinando tu elección antes de que empiece, sin que cuente como
     un cambio adicional (los cambios se miden contra la carrera anterior,
     no contra tu propio borrador de esta misma carrera)."""
+    if usuario_id != usuario_actual.get("id") and not usuario_actual.get("es_admin"):
+        raise HTTPException(status_code=403, detail="No puedes modificar el equipo de otro usuario")
     existente = db.query(Equipo).filter(
         Equipo.usuario_id == usuario_id,
         Equipo.carrera_id == carrera_id
@@ -174,12 +179,14 @@ def actualizar_equipo(usuario_id: int, carrera_id: int, equipo: EquipoCreate, db
 
 
 @router.get("/formulario/{usuario_id}/{carrera_id}")
-def formulario_equipo(usuario_id: int, carrera_id: int, db: Session = Depends(get_db)):
+def formulario_equipo(usuario_id: int, carrera_id: int, db: Session = Depends(get_db), usuario_actual: dict = Depends(get_usuario_actual)):
     """Todo lo que necesita el formulario de 'Mi equipo' de un vistazo:
     - guardado: el equipo que ya tienes para ESTA carrera, si lo hay
       (para precargar el formulario y saber si hay que crear o actualizar).
     - anterior: el equipo de la carrera anterior, si lo hay (para comparar
       y contar cambios — siempre esta referencia, nunca 'guardado')."""
+    if usuario_id != usuario_actual.get("id") and not usuario_actual.get("es_admin"):
+        raise HTTPException(status_code=403, detail="No puedes ver el equipo de otro usuario")
     carrera = db.query(Carrera).filter(Carrera.id == carrera_id).first()
     if not carrera:
         raise HTTPException(status_code=404, detail="Carrera no encontrada")
@@ -198,7 +205,9 @@ def formulario_equipo(usuario_id: int, carrera_id: int, db: Session = Depends(ge
 
 
 @router.get("/boosts/{usuario_id}/{temporada}")
-def usos_boost(usuario_id: int, temporada: int, db: Session = Depends(get_db)):
+def usos_boost(usuario_id: int, temporada: int, db: Session = Depends(get_db), usuario_actual: dict = Depends(get_usuario_actual)):
+    if usuario_id != usuario_actual.get("id") and not usuario_actual.get("es_admin"):
+        raise HTTPException(status_code=403, detail="No puedes ver los boosts de otro usuario")
     result = {}
     for cat in ['motogp', 'moto2', 'moto3']:
         campo = f'capitan_{cat}_id'
@@ -212,12 +221,16 @@ def usos_boost(usuario_id: int, temporada: int, db: Session = Depends(get_db)):
 
 
 @router.get("/usuario/{usuario_id}", response_model=List[EquipoResponse])
-def equipos_usuario(usuario_id: int, db: Session = Depends(get_db)):
+def equipos_usuario(usuario_id: int, db: Session = Depends(get_db), usuario_actual: dict = Depends(get_usuario_actual)):
+    if usuario_id != usuario_actual.get("id") and not usuario_actual.get("es_admin"):
+        raise HTTPException(status_code=403, detail="No puedes ver los equipos de otro usuario")
     return db.query(Equipo).filter(Equipo.usuario_id == usuario_id).all()
 
 
 @router.get("/{usuario_id}/{carrera_id}", response_model=EquipoResponse)
-def obtener_equipo(usuario_id: int, carrera_id: int, db: Session = Depends(get_db)):
+def obtener_equipo(usuario_id: int, carrera_id: int, db: Session = Depends(get_db), usuario_actual: dict = Depends(get_usuario_actual)):
+    if usuario_id != usuario_actual.get("id") and not usuario_actual.get("es_admin"):
+        raise HTTPException(status_code=403, detail="No puedes ver el equipo de otro usuario")
     equipo = db.query(Equipo).filter(
         Equipo.usuario_id == usuario_id,
         Equipo.carrera_id == carrera_id

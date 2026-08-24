@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.core.database import get_db
+from app.core.security import get_usuario_actual
 from app.models.liga import Liga, LigaUsuario
 from app.models.equipo import Equipo
 from app.models.pronostico import Pronostico
@@ -33,8 +34,10 @@ def puntos_totales_usuario(usuario_id: int, temporada: int, db: Session) -> floa
 
 
 @router.post("/", response_model=LigaResponse)
-def crear_liga(liga: LigaCreate, db: Session = Depends(get_db)):
-    nueva = Liga(**liga.model_dump(), codigo=generar_codigo())
+def crear_liga(liga: LigaCreate, db: Session = Depends(get_db), usuario_actual: dict = Depends(get_usuario_actual)):
+    datos_liga = liga.model_dump()
+    datos_liga["creador_id"] = usuario_actual.get("id")
+    nueva = Liga(**datos_liga, codigo=generar_codigo())
     db.add(nueva)
     db.commit()
     db.refresh(nueva)
@@ -48,7 +51,9 @@ def crear_liga(liga: LigaCreate, db: Session = Depends(get_db)):
 
 
 @router.post("/{codigo}/unirse")
-def unirse_liga(codigo: str, usuario_id: int, db: Session = Depends(get_db)):
+def unirse_liga(codigo: str, usuario_id: int, db: Session = Depends(get_db), usuario_actual: dict = Depends(get_usuario_actual)):
+    if usuario_id != usuario_actual.get("id") and not usuario_actual.get("es_admin"):
+        raise HTTPException(status_code=403, detail="No puedes unir a otro usuario a una liga")
     liga = db.query(Liga).filter(Liga.codigo == codigo).first()
     if not liga:
         raise HTTPException(status_code=404, detail="Liga no encontrada")
@@ -62,6 +67,15 @@ def unirse_liga(codigo: str, usuario_id: int, db: Session = Depends(get_db)):
     db.add(miembro)
     db.commit()
     return {"mensaje": f"Te has unido a {liga.nombre}", "codigo": codigo}
+
+
+@router.get("/mis-ligas", response_model=list[LigaResponse])
+def mis_ligas(db: Session = Depends(get_db), usuario_actual: dict = Depends(get_usuario_actual)):
+    """Ligas (públicas o privadas) de las que el usuario del token es miembro."""
+    liga_ids = db.query(LigaUsuario.liga_id).filter(
+        LigaUsuario.usuario_id == usuario_actual.get("id")
+    ).distinct()
+    return db.query(Liga).filter(Liga.id.in_(liga_ids)).all()
 
 
 @router.get("/{liga_id}", response_model=LigaResponse)

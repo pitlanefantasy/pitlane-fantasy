@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from datetime import date
 from app.core.database import get_db
-from app.core.security import get_admin_actual
+from app.core.security import get_admin_actual, get_usuario_actual
 from app.models.pronostico import Pronostico
 from app.models.carrera import Carrera
 from app.schemas.pronostico import PronosticoCreate, PronosticoResponse
@@ -13,7 +13,9 @@ router = APIRouter(prefix="/pronosticos", tags=["pronosticos"])
 
 # POST /pronosticos/ → crear pronósticos de temporada
 @router.post("/", response_model=PronosticoResponse)
-def crear_pronostico(pronostico: PronosticoCreate, db: Session = Depends(get_db)):
+def crear_pronostico(pronostico: PronosticoCreate, db: Session = Depends(get_db), usuario_actual: dict = Depends(get_usuario_actual)):
+    if pronostico.usuario_id != usuario_actual.get("id") and not usuario_actual.get("es_admin"):
+        raise HTTPException(status_code=403, detail="No puedes crear pronósticos para otro usuario")
     existente = db.query(Pronostico).filter(
         Pronostico.usuario_id == pronostico.usuario_id,
         Pronostico.temporada == pronostico.temporada
@@ -40,7 +42,9 @@ def crear_pronostico(pronostico: PronosticoCreate, db: Session = Depends(get_db)
 
 # GET /pronosticos/{usuario_id}/{temporada} → ver pronósticos de un usuario
 @router.get("/{usuario_id}/{temporada}", response_model=PronosticoResponse)
-def obtener_pronostico(usuario_id: int, temporada: int, db: Session = Depends(get_db)):
+def obtener_pronostico(usuario_id: int, temporada: int, db: Session = Depends(get_db), usuario_actual: dict = Depends(get_usuario_actual)):
+    if usuario_id != usuario_actual.get("id") and not usuario_actual.get("es_admin"):
+        raise HTTPException(status_code=403, detail="No puedes ver los pronósticos de otro usuario")
     pronostico = db.query(Pronostico).filter(
         Pronostico.usuario_id == usuario_id,
         Pronostico.temporada == temporada

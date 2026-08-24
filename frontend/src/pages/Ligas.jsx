@@ -4,6 +4,7 @@ import api, { getUsuario } from '../services/api';
 
 export default function Ligas() {
   const [ligas, setLigas] = useState([]);
+  const [misLigas, setMisLigas] = useState([]);
   const [nombreLiga, setNombreLiga] = useState('');
   const [codigo, setCodigo] = useState('');
   const [mensaje, setMensaje] = useState(null);
@@ -11,6 +12,9 @@ export default function Ligas() {
 
   useEffect(() => {
     api.get('/ligas/').then(res => setLigas(res.data)).catch(() => {});
+    if (getUsuario()) {
+      api.get('/ligas/mis-ligas').then(res => setMisLigas(res.data)).catch(() => {});
+    }
   }, []);
 
   const handleCrear = async (e) => {
@@ -28,6 +32,7 @@ export default function Ligas() {
       });
       setCodigoCreado(res.data.codigo);
       setNombreLiga('');
+      api.get('/ligas/mis-ligas').then(r => setMisLigas(r.data)).catch(() => {});
     } catch (err) {
       setMensaje({ tipo: 'error', texto: err.response?.data?.detail || 'Error al crear la liga' });
     }
@@ -42,6 +47,7 @@ export default function Ligas() {
       const res = await api.post(`/ligas/${codigo}/unirse?usuario_id=${usuario.id}`);
       setMensaje({ tipo: 'exito', texto: res.data.mensaje });
       setCodigo('');
+      api.get('/ligas/mis-ligas').then(r => setMisLigas(r.data)).catch(() => {});
     } catch (err) {
       setMensaje({ tipo: 'error', texto: err.response?.data?.detail || 'Código incorrecto o ya eres miembro' });
     }
@@ -90,6 +96,25 @@ export default function Ligas() {
         <p className={`mt-6 font-medium ${mensaje.tipo === 'exito' ? 'text-pit-up' : 'text-pit-down'}`}>
           {mensaje.texto}
         </p>
+      )}
+
+      {misLigas.length > 0 && (
+        <div className="mt-12 pt-8 border-t border-pit-muted/20">
+          <h2 className="font-display text-sm uppercase tracking-widest text-pit-muted mb-4">Mis ligas</h2>
+          <div className="space-y-3">
+            {misLigas.map(l => (
+              <div key={l.id} className="bg-white rounded-lg border border-pit-muted/20 p-4 flex justify-between items-center">
+                <div>
+                  <p className="font-medium text-pit-ink">{l.nombre}</p>
+                  <p className="text-xs text-pit-muted font-mono">Código: {l.codigo}</p>
+                </div>
+                <Link to={`/ranking-liga/${l.id}`} className="text-pit-red text-sm font-display uppercase hover:underline">
+                  Ver ranking →
+                </Link>
+              </div>
+            ))}
+          </div>
+        </div>
       )}
 
       <div className="mt-12 pt-8 border-t border-pit-muted/20">
