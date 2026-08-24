@@ -9,7 +9,10 @@ load_dotenv()
 app = FastAPI(
     title=os.getenv("APP_NAME"),
     version=os.getenv("VERSION"),
-    description="API del juego fantasy de MotoGP, Moto2 y Moto3"
+    description="API del juego fantasy de MotoGP, Moto2 y Moto3",
+    docs_url=None,
+    redoc_url=None,
+    openapi_url=None,
 )
 
 app.add_middleware(
