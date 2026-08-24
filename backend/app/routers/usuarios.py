@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from app.core.database import get_db
-from app.core.security import verificar_password, hashear_password, crear_token
+from app.core.security import verificar_password, hashear_password, crear_token, get_usuario_actual
 from app.models.usuario import Usuario
 from app.models.liga import Liga, LigaUsuario
 from app.schemas.usuario import UsuarioCreate, UsuarioResponse
@@ -83,7 +83,13 @@ def crear_usuario(usuario: UsuarioCreate, db: Session = Depends(get_db)):
 
 # GET /usuarios/{id} → obtener usuario
 @router.get("/{usuario_id}", response_model=UsuarioResponse)
-def obtener_usuario(usuario_id: int, db: Session = Depends(get_db)):
+def obtener_usuario(
+    usuario_id: int,
+    db: Session = Depends(get_db),
+    usuario_actual: dict = Depends(get_usuario_actual),
+):
+    if usuario_id != usuario_actual.get("id") and not usuario_actual.get("es_admin"):
+        raise HTTPException(status_code=403, detail="No tienes permiso para ver este usuario")
     usuario = db.query(Usuario).filter(Usuario.id == usuario_id).first()
     if not usuario:
         raise HTTPException(status_code=404, detail="Usuario no encontrado")
