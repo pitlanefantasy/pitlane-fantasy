@@ -14,7 +14,9 @@ router = APIRouter(prefix="/pronosticos", tags=["pronosticos"])
 # POST /pronosticos/ → crear pronósticos de temporada
 @router.post("/", response_model=PronosticoResponse)
 def crear_pronostico(pronostico: PronosticoCreate, db: Session = Depends(get_db), usuario_actual: dict = Depends(get_usuario_actual)):
-    if pronostico.usuario_id != usuario_actual.get("id") and not usuario_actual.get("es_admin"):
+    if usuario_actual.get("es_admin"):
+        raise HTTPException(status_code=403, detail="La cuenta de administrador no puede jugar")
+    if pronostico.usuario_id != usuario_actual.get("id"):
         raise HTTPException(status_code=403, detail="No puedes crear pronósticos para otro usuario")
     existente = db.query(Pronostico).filter(
         Pronostico.usuario_id == pronostico.usuario_id,

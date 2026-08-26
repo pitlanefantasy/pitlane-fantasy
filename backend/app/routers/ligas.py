@@ -35,6 +35,8 @@ def puntos_totales_usuario(usuario_id: int, temporada: int, db: Session) -> floa
 
 @router.post("/", response_model=LigaResponse)
 def crear_liga(liga: LigaCreate, db: Session = Depends(get_db), usuario_actual: dict = Depends(get_usuario_actual)):
+    if usuario_actual.get("es_admin"):
+        raise HTTPException(status_code=403, detail="La cuenta de administrador no puede jugar")
     datos_liga = liga.model_dump()
     datos_liga["creador_id"] = usuario_actual.get("id")
     nueva = Liga(**datos_liga, codigo=generar_codigo())
@@ -52,7 +54,9 @@ def crear_liga(liga: LigaCreate, db: Session = Depends(get_db), usuario_actual: 
 
 @router.post("/{codigo}/unirse")
 def unirse_liga(codigo: str, usuario_id: int, db: Session = Depends(get_db), usuario_actual: dict = Depends(get_usuario_actual)):
-    if usuario_id != usuario_actual.get("id") and not usuario_actual.get("es_admin"):
+    if usuario_actual.get("es_admin"):
+        raise HTTPException(status_code=403, detail="La cuenta de administrador no puede jugar")
+    if usuario_id != usuario_actual.get("id"):
         raise HTTPException(status_code=403, detail="No puedes unir a otro usuario a una liga")
     liga = db.query(Liga).filter(Liga.codigo == codigo).first()
     if not liga:

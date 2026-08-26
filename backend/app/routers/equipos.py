@@ -126,7 +126,9 @@ def validar_cambios(equipo: EquipoCreate, anterior: Equipo):
 
 @router.post("/", response_model=EquipoResponse)
 def crear_equipo(equipo: EquipoCreate, db: Session = Depends(get_db), usuario_actual: dict = Depends(get_usuario_actual)):
-    if equipo.usuario_id != usuario_actual.get("id") and not usuario_actual.get("es_admin"):
+    if usuario_actual.get("es_admin"):
+        raise HTTPException(status_code=403, detail="La cuenta de administrador no puede jugar")
+    if equipo.usuario_id != usuario_actual.get("id"):
         raise HTTPException(status_code=403, detail="No puedes crear equipo para otro usuario")
     existente = db.query(Equipo).filter(
         Equipo.usuario_id == equipo.usuario_id,
@@ -155,7 +157,9 @@ def actualizar_equipo(usuario_id: int, carrera_id: int, equipo: EquipoCreate, db
     seguir afinando tu elección antes de que empiece, sin que cuente como
     un cambio adicional (los cambios se miden contra la carrera anterior,
     no contra tu propio borrador de esta misma carrera)."""
-    if usuario_id != usuario_actual.get("id") and not usuario_actual.get("es_admin"):
+    if usuario_actual.get("es_admin"):
+        raise HTTPException(status_code=403, detail="La cuenta de administrador no puede jugar")
+    if usuario_id != usuario_actual.get("id"):
         raise HTTPException(status_code=403, detail="No puedes modificar el equipo de otro usuario")
     existente = db.query(Equipo).filter(
         Equipo.usuario_id == usuario_id,
