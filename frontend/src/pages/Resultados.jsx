@@ -43,7 +43,7 @@ export default function Resultados() {
     : [];
 
   const esMotoGP = categoria === 'MotoGP';
-  const colsGrid = esMotoGP ? 'grid-cols-[1fr_7rem_7rem_5rem]' : 'grid-cols-[1fr_7rem_5rem]';
+  const colsGrid = esMotoGP ? 'grid-cols-[1fr_7rem_7rem_5rem]' : 'grid-cols-[3rem_1fr_5rem]';
 
   return (
     <div className="bg-pit-bg min-h-screen px-6 md:px-16 py-12">
@@ -110,9 +110,10 @@ export default function Resultados() {
                 ) : (
                   <div className="mt-6 bg-white rounded-lg border border-pit-muted/20 overflow-hidden">
                     <div className={`grid ${colsGrid} gap-2 px-4 py-2 text-xs font-display uppercase tracking-wide text-pit-muted border-b border-pit-muted/10`}>
+                      {!esMotoGP && <span>Pos.</span>}
                       <span>Piloto</span>
                       {esMotoGP && <span className="text-center">Sprint</span>}
-                      <span className="text-center">{esMotoGP ? 'Carrera' : 'Pos.'}</span>
+                      {esMotoGP && <span className="text-center">Carrera</span>}
                       <span className="text-right">Total</span>
                     </div>
                     <div className="divide-y divide-pit-muted/10">
@@ -122,34 +123,30 @@ export default function Resultados() {
                         return (
                           <div
                             key={r.piloto_id}
-                            className={`grid ${colsGrid} gap-2 items-center px-4 py-2.5 text-sm`}
+                            className={`grid ${colsGrid} gap-2 items-center px-4 py-3 text-sm`}
                           >
+                            {!esMotoGP && (
+                              <span className={`font-display font-bold text-base ${r.abandono ? 'text-pit-down' : 'text-pit-ink'}`}>
+                                {r.abandono ? '—' : r.posicion_carrera ?? '—'}
+                              </span>
+                            )}
                             <div className="flex items-center gap-2 min-w-0">
-                              <span className="text-pit-ink font-medium truncate">{r.piloto_nombre}</span>
+                              <span className="text-pit-ink font-bold text-base truncate">{r.piloto_nombre}</span>
                               {r.hizo_pole && <span className="text-pit-best text-xs font-bold flex-shrink-0">POLE</span>}
                               {r.vuelta_rapida && <span className="text-pit-up text-xs font-bold flex-shrink-0">VR</span>}
+                              {r.abandono && <span className="text-pit-down text-xs font-bold flex-shrink-0">DNF</span>}
                             </div>
                             {esMotoGP && (
                               <span className="font-mono text-pit-muted text-center text-xs">
                                 {r.posicion_sprint ? `P${r.posicion_sprint} · ${ptsSprint}pts` : '—'}
                               </span>
                             )}
-                            <span className="font-mono text-pit-muted text-center text-xs">
-                              {esMotoGP ? (
-                                r.abandono ? (
-                                  <span className="text-pit-down font-bold">DNF · {ptsCarrera}pts</span>
-                                ) : (
-                                  `P${r.posicion_carrera} · ${ptsCarrera}pts`
-                                )
-                              ) : (
-                                r.abandono ? (
-                                  <span className="text-pit-down font-bold">DNF</span>
-                                ) : (
-                                  r.posicion_carrera ?? '—'
-                                )
-                              )}
-                            </span>
-                            <span className="font-mono font-bold text-pit-ink text-right">{r.puntos_total} pts</span>
+                            {esMotoGP && (
+                              <span className="font-mono text-pit-muted text-center text-xs">
+                                {r.abandono ? `DNF · ${ptsCarrera}pts` : `P${r.posicion_carrera} · ${ptsCarrera}pts`}
+                              </span>
+                            )}
+                            <span className="font-mono font-bold text-base text-pit-ink text-right">{r.puntos_total} pts</span>
                           </div>
                         );
                       })}
