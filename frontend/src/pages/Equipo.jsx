@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import api, { getUsuario } from '../services/api';
+import useCountdown from '../hooks/useCountdown';
 
 const PRESUPUESTO = 75;
 const MAX_BOOSTS = 3;
@@ -31,6 +32,15 @@ function copiarAFormulario(origen) {
 
 export default function Equipo() {
   const [proximaCarrera, setProximaCarrera] = useState(null);
+  const fechaCierre = proximaCarrera
+    ? (() => {
+        const d = new Date(proximaCarrera.fecha + 'T00:00:00');
+        d.setDate(d.getDate() - 1);
+        d.setHours(10, 50, 0, 0);
+        return d;
+      })()
+    : null;
+  const cuentaAtras = useCountdown(fechaCierre || new Date());
   const [pilotos, setPilotos] = useState({ MotoGP: [], Moto2: [], Moto3: [] });
   const [fabricantes, setFabricantes] = useState([]);
   const [equiposReales, setEquiposReales] = useState([]);
@@ -159,6 +169,21 @@ export default function Equipo() {
       <h1 className="font-display font-black text-3xl text-pit-ink uppercase mt-1">
         {proximaCarrera ? `${proximaCarrera.nombre}` : 'Cargando...'}
       </h1>
+
+      {proximaCarrera && !cuentaAtras.ended && (
+        <div className="inline-flex items-center gap-3 bg-pit-ink text-white rounded-lg px-5 py-3 mt-4 font-mono">
+          <span className="text-xs uppercase tracking-widest text-pit-muted font-display">Cierre de inscripción</span>
+          <span className="text-lg font-bold">
+            {cuentaAtras.days}d {String(cuentaAtras.hours).padStart(2, '0')}h {String(cuentaAtras.minutes).padStart(2, '0')}m {String(cuentaAtras.seconds).padStart(2, '0')}s
+          </span>
+        </div>
+      )}
+
+      {proximaCarrera && cuentaAtras.ended && (
+        <div className="inline-flex items-center gap-3 bg-pit-down-bg text-pit-down rounded-lg px-5 py-3 mt-4 font-display uppercase text-sm font-bold">
+          Plazo de inscripción cerrado — la clasificación ya ha empezado
+        </div>
+      )}
 
       {yaGuardado !== undefined && (
         <p className="text-sm text-pit-muted mt-2">

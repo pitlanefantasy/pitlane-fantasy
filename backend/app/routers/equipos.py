@@ -9,6 +9,7 @@ from app.models.fabricante import Fabricante
 from app.models.equipo_real import EquipoReal
 from app.schemas.equipo import EquipoCreate, EquipoResponse
 from typing import List, Optional
+from datetime import date, timedelta
 
 router = APIRouter(prefix="/equipos", tags=["equipos"])
 
@@ -124,12 +125,27 @@ def validar_cambios(equipo: EquipoCreate, anterior: Equipo):
             detail=f"Has cambiado {cambios} pilotos/fabricante/equipo — el máximo por carrera es {MAX_CAMBIOS_POR_CARRERA}")
 
 
+def validar_plazo_carrera(carrera_id: int, db: Session):
+    """El equipo se cierra el mismo día de la clasificación (sábado),
+    un día antes de la fecha de carrera guardada (domingo)."""
+    carrera = db.query(Carrera).filter(Carrera.id == carrera_id).first()
+    if not carrera:
+        raise HTTPException(status_code=404, detail="Carrera no encontrada")
+    cierre = carrera.fecha - timedelta(days=1)
+    if date.today() >= cierre:
+        raise HTTPException(
+            status_code=400,
+            detail=f"El plazo para esta carrera cerró el {cierre.strftime('%d/%m/%Y')}, con la clasificación"
+        )
+
+
 @router.post("/", response_model=EquipoResponse)
 def crear_equipo(equipo: EquipoCreate, db: Session = Depends(get_db), usuario_actual: dict = Depends(get_usuario_actual)):
     if usuario_actual.get("es_admin"):
         raise HTTPException(status_code=403, detail="La cuenta de administrador no puede jugar")
     if equipo.usuario_id != usuario_actual.get("id"):
         raise HTTPException(status_code=403, detail="No puedes crear equipo para otro usuario")
+    validar_plazo_carrera(equipo.carrera_id, db)
     existente = db.query(Equipo).filter(
         Equipo.usuario_id == equipo.usuario_id,
         Equipo.carrera_id == equipo.carrera_id
@@ -161,6 +177,7 @@ def actualizar_equipo(usuario_id: int, carrera_id: int, equipo: EquipoCreate, db
         raise HTTPException(status_code=403, detail="La cuenta de administrador no puede jugar")
     if usuario_id != usuario_actual.get("id"):
         raise HTTPException(status_code=403, detail="No puedes modificar el equipo de otro usuario")
+    validar_plazo_carrera(carrera_id, db)
     existente = db.query(Equipo).filter(
         Equipo.usuario_id == usuario_id,
         Equipo.carrera_id == carrera_id
